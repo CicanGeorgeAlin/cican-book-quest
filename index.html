@@ -1,65 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width,
-                 initial-scale=1.0">
+<meta charset="UTF-8">
 
-    <title>CICAN BOOK QUEST</title>
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1,
+               maximum-scale=1">
 
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
+<title>CICAN BOOK QUEST</title>
 
-            background: #111;
-            color: white;
+<style>
 
-            font-family: Arial, sans-serif;
+* {
+    box-sizing: border-box;
+}
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+html,
+body {
+    margin: 0;
+    min-height: 100%;
 
-            text-align: center;
-        }
+    background: #111;
+    color: white;
 
-        .box {
-            padding: 30px;
-        }
+    font-family: Arial, sans-serif;
+}
 
-        h1 {
-            font-size: 32px;
-            letter-spacing: 5px;
-        }
+body {
+    padding: 30px 18px 50px;
+}
 
-        p {
-            color: #aaa;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-    </style>
+.container {
+    width: min(900px, 100%);
+    margin: auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+h1 {
+    margin: 0 0 12px;
+
+    font-size: 32px;
+
+    letter-spacing: 5px;
+}
+
+.subtitle {
+    color: #999;
+
+    line-height: 1.5;
+}
+
+
+/* BOOK GRID */
+
+#books {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(240px, 1fr)
+        );
+
+    gap: 18px;
+}
+
+
+/* BOOK CARD */
+
+.book {
+
+    min-height: 270px;
+
+    padding: 22px;
+
+    border:
+        1px solid #444;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #292929,
+            #181818
+        );
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+}
+
+.icon {
+
+    font-size: 55px;
+
+    margin-bottom: 15px;
+}
+
+.book h2 {
+
+    margin: 0 0 7px;
+
+    font-size: 22px;
+}
+
+.author {
+
+    color: #aaa;
+
+    font-size: 14px;
+}
+
+.description {
+
+    margin-top: 14px;
+
+    color: #888;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* PLAY BUTTON */
+
+.play {
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: black;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.play:active {
+
+    transform: scale(.97);
+}
+
+
+/* FOOTER */
+
+footer {
+
+    margin-top: 40px;
+
+    text-align: center;
+
+    color: #555;
+
+    font-size: 12px;
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-    <div class="box">
+<div class="container">
 
-        <h1>CICAN BOOK QUEST</h1>
 
-        <p>
-            PLAY A GAME.<br>
-            DISCOVER A BOOK.
-        </p>
+<header>
 
-        <p>
-            TEST VERSION
-        </p>
+    <h1>
+        CICAN BOOK QUEST
+    </h1>
+
+    <div class="subtitle">
+
+        PLAY A GAME.<br>
+        DISCOVER A BOOK.
 
     </div>
 
+</header>
+
+
+<main id="books">
+</main>
+
+
+<footer>
+
+    CICAN BOOK QUEST
+
+</footer>
+
+
+</div>
+
+
+<script>
+
+/*
+=========================================================
+BOOK LIBRARY
+
+Every book can have a completely different game.
+
+To add a new book later, we add another object here.
+=========================================================
+*/
+
+const BOOKS = [
+
+    {
+
+        title: "1984",
+
+        author: "George Orwell",
+
+        icon: "👁️",
+
+        description:
+            "The city is watching. Can you find a place where you cannot be seen?",
+
+        game:
+            "games/1984.html"
+
+    }
+
+];
+
+
+/*
+=========================================================
+CREATE BOOK CARDS
+=========================================================
+*/
+
+const booksContainer =
+    document.getElementById(
+        "books"
+    );
+
+
+BOOKS.forEach(
+    book => {
+
+        const card =
+            document.createElement(
+                "article"
+            );
+
+        card.className =
+            "book";
+
+
+        card.innerHTML = `
+
+            <div>
+
+                <div class="icon">
+                    ${book.icon}
+                </div>
+
+                <h2>
+                    ${book.title}
+                </h2>
+
+                <div class="author">
+                    ${book.author}
+                </div>
+
+                <div class="description">
+                    ${book.description}
+                </div>
+
+            </div>
+
+            <button
+                class="play"
+                type="button">
+
+                PLAY GAME
+
+            </button>
+
+        `;
+
+
+        card
+            .querySelector(".play")
+            .addEventListener(
+                "click",
+                function() {
+
+                    window.location.href =
+                        book.game;
+
+                }
+            );
+
+
+        booksContainer.appendChild(
+            card
+        );
+
+    }
+);
+
+</script>
+
 </body>
+
 </html>
