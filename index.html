@@ -2,203 +2,160 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width,
-               initial-scale=1,
-               maximum-scale=1,
-               user-scalable=no">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>THE WATCHED CITY — 1984</title>
 
 <style>
 *{
   box-sizing:border-box;
+  margin:0;
+  padding:0;
   user-select:none;
   -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
 
 html,body{
-  margin:0;
   width:100%;
   height:100%;
   overflow:hidden;
   background:#080a0d;
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
   touch-action:none;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
-#game{
+canvas{
   position:fixed;
   inset:0;
-  width:100vw;
-  height:100vh;
+  width:100%;
+  height:100%;
   display:block;
 }
 
-/* =====================================================
-   HUD
-===================================================== */
-
 #hud{
   position:fixed;
-  left:16px;
-  top:14px;
-  z-index:20;
+  left:15px;
+  top:13px;
+  z-index:10;
+  color:#fff;
   pointer-events:none;
-  text-shadow:0 2px 6px #000;
+  text-shadow:0 2px 5px #000;
 }
 
 #title{
-  font-size:21px;
+  font-size:20px;
   font-weight:900;
-  letter-spacing:4px;
+  letter-spacing:3px;
 }
 
 #part{
-  margin-top:5px;
-  font-size:12px;
-  letter-spacing:2px;
+  margin-top:4px;
   color:#bbb;
+  font-size:11px;
+  letter-spacing:2px;
 }
 
 #objective{
-  margin-top:8px;
-  font-size:14px;
+  margin-top:7px;
   color:#f1c84b;
+  font-size:13px;
   font-weight:bold;
 }
 
-#progressBox{
+#progress{
   position:fixed;
-  right:16px;
-  top:15px;
-  width:205px;
-  z-index:20;
+  right:14px;
+  top:14px;
+  width:180px;
+  z-index:10;
+  color:#fff;
   pointer-events:none;
-  text-shadow:0 2px 6px #000;
+  text-shadow:0 2px 5px #000;
 }
 
 #progressText{
   text-align:right;
-  font-size:12px;
-  font-weight:bold;
-  letter-spacing:2px;
-  margin-bottom:6px;
+  font-size:11px;
+  letter-spacing:1px;
+  margin-bottom:5px;
 }
 
 #progressBar{
-  height:13px;
-  border:2px solid #777;
+  height:11px;
+  border:1px solid #777;
   border-radius:20px;
+  background:#15181c;
   overflow:hidden;
-  background:#171a1e;
 }
 
 #progressFill{
   width:0%;
   height:100%;
   background:#f1c84b;
-  transition:width:.35s ease;
+  transition:width:.3s;
 }
-
-/* =====================================================
-   OVERLAYS
-===================================================== */
 
 .overlay{
   position:fixed;
   inset:0;
   z-index:50;
-
   display:flex;
-  justify-content:center;
   align-items:center;
-
-  padding:18px;
-
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(65,10,10,.38),
-      rgba(0,0,0,.95)
-    );
+  justify-content:center;
+  padding:16px;
+  background:rgba(0,0,0,.9);
 }
 
 .panel{
-  width:min(700px,94vw);
+  width:min(680px,94vw);
   max-height:90vh;
   overflow:auto;
-
-  padding:28px 25px;
-
-  text-align:center;
-
+  padding:27px 22px;
+  border:1px solid #59616a;
   border-radius:18px;
-  border:1px solid #626b74;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(20,24,30,.98),
-      rgba(5,7,10,.98)
-    );
-
-  box-shadow:
-    0 25px 80px rgba(0,0,0,.8);
+  background:#101419;
+  color:#fff;
+  text-align:center;
+  box-shadow:0 25px 80px rgba(0,0,0,.8);
 }
 
 .eye{
   font-size:48px;
-  line-height:1;
-  margin-bottom:9px;
+  margin-bottom:8px;
 }
 
 .panel h1{
-  margin:0;
-  font-size:29px;
-  letter-spacing:5px;
+  font-size:27px;
+  letter-spacing:4px;
 }
 
 .panel h2{
-  margin:10px 0 24px;
+  margin-top:9px;
+  margin-bottom:20px;
   font-size:15px;
+  color:#ccc;
   letter-spacing:2px;
-  color:#d0d0d0;
 }
 
 .panel p{
   max-width:590px;
   margin:12px auto;
-
-  color:#d7d9dc;
-
+  color:#d6d9dc;
   font-size:15px;
   line-height:1.65;
 }
 
 button{
   min-width:190px;
-
   margin:9px 4px 0;
-  padding:14px 22px;
-
+  padding:14px 20px;
   border:0;
-  border-radius:11px;
-
+  border-radius:10px;
   background:#f1c84b;
   color:#111;
-
   font-size:14px;
   font-weight:900;
   letter-spacing:1px;
-
-  cursor:pointer;
-
-  box-shadow:
-    0 5px 20px rgba(0,0,0,.35);
 }
 
 button:active{
@@ -211,162 +168,89 @@ button:active{
   border:1px solid #59616a;
 }
 
-/* =====================================================
-   STORY
-===================================================== */
-
-#storyOverlay{
+#storyOverlay,
+#completeOverlay{
   display:none;
 }
 
-.discoveryTag{
+#discoveryLabel{
   color:#f1c84b;
-  font-size:13px;
-  font-weight:900;
+  font-size:12px;
+  font-weight:bold;
   letter-spacing:4px;
 }
 
-.discoveryLine{
-  height:1px;
-  background:#f1c84b;
-  margin:10px 0 20px;
-}
-
-#storyTitle{
-  margin:0 0 13px;
-  font-size:27px;
+#discoveryTitle{
+  margin-top:12px;
+  font-size:25px;
   letter-spacing:2px;
 }
 
-#storyText{
-  color:#d6d9dd;
-  font-size:15px;
-  line-height:1.7;
+#discoveryText{
+  margin-top:15px;
 }
-
-/* =====================================================
-   COMPLETION
-===================================================== */
-
-#bookOverlay{
-  display:none;
-}
-
-/* =====================================================
-   JOYSTICK
-===================================================== */
 
 #joystick{
   position:fixed;
-
   left:50%;
-  bottom:22px;
-  top:auto;
-
+  bottom:20px;
   transform:translateX(-50%);
-
   width:150px;
   height:150px;
-
-  border-radius:50%;
-
-  border:2px solid rgba(220,230,240,.65);
-
-  background:
-    rgba(10,13,17,.55);
-
   z-index:30;
-
+  border:2px solid rgba(220,230,240,.65);
+  border-radius:50%;
+  background:rgba(10,13,17,.58);
   touch-action:none;
 }
 
 #stick{
   position:absolute;
-
   left:50%;
   top:50%;
-
   width:65px;
   height:65px;
-
   margin-left:-32.5px;
   margin-top:-32.5px;
-
-  border-radius:50%;
-
-  background:
-    rgba(220,225,230,.82);
-
   border:2px solid #fff;
-
-  box-shadow:
-    0 4px 15px rgba(0,0,0,.45);
-
+  border-radius:50%;
+  background:rgba(220,225,230,.82);
+  box-shadow:0 4px 15px rgba(0,0,0,.5);
   pointer-events:none;
 }
 
-/* =====================================================
-   HINT
-===================================================== */
-
 #hint{
   position:fixed;
-
   left:50%;
-  bottom:188px;
-
+  bottom:181px;
   transform:translateX(-50%);
-
   z-index:25;
-
-  max-width:75vw;
-
-  padding:9px 14px;
-
+  max-width:78vw;
+  padding:8px 13px;
+  border:1px solid rgba(255,255,255,.15);
   border-radius:9px;
-
-  background:
-    rgba(0,0,0,.75);
-
-  border:
-    1px solid rgba(255,255,255,.15);
-
+  background:rgba(0,0,0,.75);
   color:#eee;
-
-  font-size:12px;
+  font-size:11px;
   text-align:center;
-
-  pointer-events:none;
-
   opacity:0;
-
-  transition:opacity .2s;
+  pointer-events:none;
+  transition:opacity:.2s;
 }
 
 #hint.show{
   opacity:1;
 }
 
-/* =====================================================
-   RESET
-===================================================== */
-
 #reset{
   position:fixed;
-
-  right:12px;
-  bottom:12px;
-
+  right:9px;
+  bottom:9px;
   z-index:35;
-
   min-width:auto;
-
-  padding:7px 10px;
-
-  font-size:10px;
-
-  opacity:.4;
-
+  padding:6px 9px;
+  font-size:9px;
+  opacity:.35;
   background:#20252b;
   color:#ddd;
 }
@@ -374,8 +258,7 @@ button:active{
 @media(max-width:600px){
 
   #title{
-    font-size:17px;
-    letter-spacing:3px;
+    font-size:16px;
   }
 
   #part{
@@ -383,13 +266,12 @@ button:active{
   }
 
   #objective{
-    font-size:11px;
+    font-size:10px;
   }
 
-  #progressBox{
-    width:140px;
-    right:11px;
-    top:12px;
+  #progress{
+    width:135px;
+    right:10px;
   }
 
   #progressText{
@@ -399,15 +281,15 @@ button:active{
   #joystick{
     width:145px;
     height:145px;
-    bottom:18px;
+    bottom:17px;
   }
 
   #hint{
-    bottom:178px;
+    bottom:173px;
   }
 
   .panel{
-    padding:22px 17px;
+    padding:22px 16px;
   }
 
   .panel h1{
@@ -425,56 +307,30 @@ button:active{
 
 <canvas id="game"></canvas>
 
-<!-- =====================================================
-     HUD
-===================================================== -->
-
 <div id="hud">
-
-  <div id="title">
-    THE WATCHED CITY
-  </div>
-
-  <div id="part">
-    PART I — THE WORLD
-  </div>
-
-  <div id="objective">
-    Explore the city.
-  </div>
-
+  <div id="title">THE WATCHED CITY</div>
+  <div id="part">PART I — THE WORLD</div>
+  <div id="objective">Explore the city.</div>
 </div>
 
-<div id="progressBox">
-
-  <div id="progressText">
-    UNDERSTANDING 0%
-  </div>
-
+<div id="progress">
+  <div id="progressText">UNDERSTANDING 0%</div>
   <div id="progressBar">
     <div id="progressFill"></div>
   </div>
-
 </div>
 
 
-<!-- =====================================================
-     START SCREEN
-===================================================== -->
+<!-- START -->
 
 <div id="startOverlay" class="overlay">
-
   <div class="panel">
 
     <div class="eye">👁️</div>
 
-    <h1>
-      THE WATCHED CITY
-    </h1>
+    <h1>THE WATCHED CITY</h1>
 
-    <h2>
-      1984 — George Orwell
-    </h2>
+    <h2>1984 — George Orwell</h2>
 
     <p>
       You are about to enter a world you may know nothing about.
@@ -509,56 +365,40 @@ button:active{
     </button>
 
   </div>
-
 </div>
 
 
-<!-- =====================================================
-     DISCOVERY SCREEN
-===================================================== -->
+<!-- DISCOVERY -->
 
 <div id="storyOverlay" class="overlay">
-
   <div class="panel">
 
-    <div class="discoveryTag">
+    <div id="discoveryLabel">
       DISCOVERY
     </div>
 
-    <div class="discoveryLine"></div>
+    <h2 id="discoveryTitle"></h2>
 
-    <h2 id="storyTitle">
-      THE CITY
-    </h2>
-
-    <p id="storyText"></p>
+    <p id="discoveryText"></p>
 
     <button id="continueButton">
       CONTINUE
     </button>
 
   </div>
-
 </div>
 
 
-<!-- =====================================================
-     COMPLETION
-===================================================== -->
+<!-- COMPLETION -->
 
-<div id="bookOverlay" class="overlay">
-
+<div id="completeOverlay" class="overlay">
   <div class="panel">
 
     <div class="eye">👁️</div>
 
-    <h1>
-      THE WATCHED CITY
-    </h1>
+    <h1>THE WATCHED CITY</h1>
 
-    <h2>
-      EXPERIENCE COMPLETE
-    </h2>
+    <h2>EXPERIENCE COMPLETE</h2>
 
     <p>
       You have explored the world of
@@ -587,24 +427,21 @@ button:active{
       Orwell's actual writing.
     </p>
 
-    <button id="readBookButton">
+    <button id="readButton">
       🔓 READ 1984
     </button>
 
     <button
       class="secondary"
-      onclick="location.href='../index.html'">
+      id="libraryButton">
       BACK TO LIBRARY
     </button>
 
   </div>
-
 </div>
 
 
-<!-- =====================================================
-     JOYSTICK
-===================================================== -->
+<!-- JOYSTICK -->
 
 <div id="joystick">
   <div id="stick"></div>
@@ -620,29 +457,7 @@ button:active{
 <script>
 
 /* =========================================================
-   CICAN BOOK QUEST
-   THE WATCHED CITY
-
-   FINAL 1984 VERSION
-
-   PLAYER:
-   ROUND WHITE BALL + TWO EYES
-
-   CONTROL:
-   BOTTOM-CENTER JOYSTICK
-
-   DESIGN:
-   FREE EXPLORATION
-   + BOOK-SPECIFIC DISCOVERY
-   + ENVIRONMENTAL STORYTELLING
-   + PROGRESSIVE WORLD CHANGE
-   + RETURN TO START
-   + BOOK UNLOCK
-========================================================= */
-
-
-/* =========================================================
-   CANVAS
+   BASIC SETUP
 ========================================================= */
 
 const canvas =
@@ -651,19 +466,16 @@ const canvas =
 const ctx =
   canvas.getContext("2d");
 
-let W=0;
-let H=0;
+let W = 0;
+let H = 0;
 
 function resize(){
 
-  W=
-    canvas.width=
-    window.innerWidth;
+  W = window.innerWidth;
+  H = window.innerHeight;
 
-  H=
-    canvas.height=
-    window.innerHeight;
-
+  canvas.width = W;
+  canvas.height = H;
 }
 
 window.addEventListener(
@@ -678,13 +490,13 @@ resize();
    WORLD
 ========================================================= */
 
-const WORLD_W=4200;
-const WORLD_H=3400;
+const WORLD_WIDTH = 4200;
+const WORLD_HEIGHT = 3400;
 
-const START_X=700;
-const START_Y=2700;
+const START_X = 700;
+const START_Y = 2700;
 
-const camera={
+const camera = {
   x:0,
   y:0
 };
@@ -694,7 +506,7 @@ const camera={
    PLAYER
 ========================================================= */
 
-const player={
+const player = {
 
   x:START_X,
   y:START_Y,
@@ -710,9 +522,6 @@ const player={
 
   friction:.82,
 
-  directionX:0,
-  directionY:1,
-
   walking:false,
 
   animation:0
@@ -724,7 +533,7 @@ const player={
    FOLLOWING CHARACTER
 ========================================================= */
 
-const companion={
+const companion = {
 
   x:START_X+75,
   y:START_Y+30,
@@ -735,10 +544,10 @@ const companion={
 
 
 /* =========================================================
-   STATE
+   GAME STATE
 ========================================================= */
 
-const state={
+const state = {
 
   started:false,
 
@@ -755,94 +564,84 @@ const state={
    JOYSTICK
 ========================================================= */
 
-const joystick=
+const joystick =
   document.getElementById(
     "joystick"
   );
 
-const stick=
+const stick =
   document.getElementById(
     "stick"
   );
 
-let joystickTouchId=null;
+let joystickTouchId = null;
 
-let joyX=0;
-let joyY=0;
+let joyX = 0;
+let joyY = 0;
 
 
-function setStick(
+function moveStick(
   clientX,
   clientY
 ){
 
-  const rect=
+  const rect =
     joystick.getBoundingClientRect();
 
-  const centerX=
-    rect.left+
-    rect.width/2;
+  const centerX =
+    rect.left +
+    rect.width / 2;
 
-  const centerY=
-    rect.top+
-    rect.height/2;
+  const centerY =
+    rect.top +
+    rect.height / 2;
 
-  let dx=
-    clientX-centerX;
+  let dx =
+    clientX - centerX;
 
-  let dy=
-    clientY-centerY;
+  let dy =
+    clientY - centerY;
 
-  const max=
-    rect.width*.34;
+  const max =
+    rect.width * .34;
 
-  const distance=
+  const distance =
     Math.sqrt(
-      dx*dx+
-      dy*dy
+      dx * dx +
+      dy * dy
     );
 
+  if(distance > max){
 
-  if(distance>max){
+    dx =
+      dx / distance * max;
 
-    dx=
-      dx/distance*
-      max;
-
-    dy=
-      dy/distance*
-      max;
+    dy =
+      dy / distance * max;
 
   }
 
+  joyX = dx / max;
+  joyY = dy / max;
 
-  joyX=
-    dx/max;
-
-  joyY=
-    dy/max;
-
-
-  stick.style.transform=
-    "translate("+
-    dx+
-    "px,"+
-    dy+
+  stick.style.transform =
+    "translate(" +
+    dx +
+    "px," +
+    dy +
     "px)";
-
 }
 
 
-function resetStick(){
+function resetJoystick(){
 
-  joystickTouchId=null;
+  joystickTouchId = null;
 
-  joyX=0;
-  joyY=0;
+  joyX = 0;
+  joyY = 0;
 
-  stick.style.transform=
+  stick.style.transform =
     "translate(0px,0px)";
-
 }
 
 
@@ -851,24 +650,21 @@ joystick.addEventListener(
   function(e){
 
     if(
-      joystickTouchId!==null
-    )
+      joystickTouchId !== null
+    ){
       return;
+    }
 
-
-    const touch=
+    const touch =
       e.changedTouches[0];
 
-
-    joystickTouchId=
+    joystickTouchId =
       touch.identifier;
 
-
-    setStick(
+    moveStick(
       touch.clientX,
       touch.clientY
     );
-
 
     e.preventDefault();
 
@@ -882,32 +678,34 @@ document.addEventListener(
   function(e){
 
     if(
-      joystickTouchId===null
-    )
+      joystickTouchId === null
+    ){
       return;
-
+    }
 
     for(
-      const touch
-      of e.changedTouches
+      let i=0;
+      i<e.changedTouches.length;
+      i++
     ){
 
+      const touch =
+        e.changedTouches[i];
+
       if(
-        touch.identifier===
+        touch.identifier ===
         joystickTouchId
       ){
 
-        setStick(
+        moveStick(
           touch.clientX,
           touch.clientY
         );
 
         e.preventDefault();
 
-        break;
-
+        return;
       }
-
     }
 
   },
@@ -920,21 +718,20 @@ document.addEventListener(
   function(e){
 
     for(
-      const touch
-      of e.changedTouches
+      let i=0;
+      i<e.changedTouches.length;
+      i++
     ){
 
       if(
-        touch.identifier===
+        e.changedTouches[i].identifier ===
         joystickTouchId
       ){
 
-        resetStick();
+        resetJoystick();
 
-        break;
-
+        return;
       }
-
     }
 
   },
@@ -944,25 +741,9 @@ document.addEventListener(
 
 document.addEventListener(
   "touchcancel",
-  function(e){
+  function(){
 
-    for(
-      const touch
-      of e.changedTouches
-    ){
-
-      if(
-        touch.identifier===
-        joystickTouchId
-      ){
-
-        resetStick();
-
-        break;
-
-      }
-
-    }
+    resetJoystick();
 
   },
   {passive:false}
@@ -970,275 +751,275 @@ document.addEventListener(
 
 
 /* =========================================================
-   1984 BOOK DNA
+   1984 DISCOVERY DATA
 ========================================================= */
 
-const objects=[
+const discoveries = [
 
-{
-id:"city",
-x:520,
-y:2450,
-part:1,
-title:"THE CITY",
-text:
-"Oceania is a controlled society where daily life is shaped by surveillance, propaganda, scarcity and obedience. The city itself is part of the system."
-},
+  {
+    id:"city",
+    x:520,
+    y:2450,
+    part:1,
+    title:"THE CITY",
+    text:
+      "Oceania is a controlled society where daily life is shaped by surveillance, propaganda, scarcity and obedience. The city itself is part of the system."
+  },
 
-{
-id:"big-brother",
-x:820,
-y:2200,
-part:1,
-title:"BIG BROTHER",
-text:
-"Big Brother is the face of the Party. His image appears everywhere and represents the authority of the Party."
-},
+  {
+    id:"big-brother",
+    x:820,
+    y:2200,
+    part:1,
+    title:"BIG BROTHER",
+    text:
+      "Big Brother is the face of the Party. His image appears everywhere and represents the authority of the Party."
+  },
 
-{
-id:"telescreen",
-x:1120,
-y:1900,
-part:1,
-title:"THE TELESCREEN",
-text:
-"The telescreen broadcasts Party messages while also allowing people to be watched. Private life has almost disappeared."
-},
+  {
+    id:"telescreen",
+    x:1120,
+    y:1900,
+    part:1,
+    title:"THE TELESCREEN",
+    text:
+      "The telescreen broadcasts Party messages while also allowing people to be watched. Private life has almost disappeared."
+  },
 
-{
-id:"hate",
-x:1450,
-y:2150,
-part:1,
-title:"TWO MINUTES HATE",
-text:
-"Citizens are directed into collective hatred against enemies such as Emmanuel Goldstein. Emotion becomes something the Party can organize."
-},
+  {
+    id:"hate",
+    x:1450,
+    y:2150,
+    part:1,
+    title:"TWO MINUTES HATE",
+    text:
+      "Citizens are directed into collective hatred against enemies such as Emmanuel Goldstein. Emotion becomes something the Party can organize."
+  },
 
-{
-id:"thoughtcrime",
-x:1770,
-y:1900,
-part:1,
-title:"THOUGHTCRIME",
-text:
-"In Oceania, dangerous ideas can themselves be crimes. The Party seeks control over thought as well as behaviour."
-},
+  {
+    id:"thoughtcrime",
+    x:1770,
+    y:1900,
+    part:1,
+    title:"THOUGHTCRIME",
+    text:
+      "In Oceania, dangerous ideas can themselves be crimes. The Party seeks control over thought as well as behaviour."
+  },
 
-{
-id:"truth",
-x:2050,
-y:1600,
-part:1,
-title:"MINISTRY OF TRUTH",
-text:
-"Winston works at the Ministry of Truth, where records are altered so that the past agrees with the Party's current version of reality."
-},
+  {
+    id:"truth",
+    x:2050,
+    y:1600,
+    part:1,
+    title:"MINISTRY OF TRUTH",
+    text:
+      "Winston works at the Ministry of Truth, where records are altered so that the past agrees with the Party's current version of reality."
+  },
 
-{
-id:"memory-hole",
-x:2320,
-y:1800,
-part:1,
-title:"MEMORY HOLE",
-text:
-"Documents that contradict the Party can be destroyed. Physical evidence of yesterday disappears."
-},
+  {
+    id:"memory-hole",
+    x:2320,
+    y:1800,
+    part:1,
+    title:"MEMORY HOLE",
+    text:
+      "Documents that contradict the Party can be destroyed. Physical evidence of yesterday disappears."
+  },
 
-{
-id:"newspeak",
-x:2600,
-y:1450,
-part:1,
-title:"NEWSPEAK",
-text:
-"Newspeak is designed to reduce the range of language. Limiting language can also limit the range of thought."
-},
+  {
+    id:"newspeak",
+    x:2600,
+    y:1450,
+    part:1,
+    title:"NEWSPEAK",
+    text:
+      "Newspeak is designed to reduce the range of language. Limiting language can also limit the range of thought."
+  },
 
-{
-id:"doublethink",
-x:2900,
-y:1700,
-part:1,
-title:"DOUBLETHINK",
-text:
-"Doublethink involves accepting contradictory ideas when the Party requires them. Reality can be reshaped to fit authority."
-},
+  {
+    id:"doublethink",
+    x:2900,
+    y:1700,
+    part:1,
+    title:"DOUBLETHINK",
+    text:
+      "Doublethink involves accepting contradictory ideas when the Party requires them. Reality can be reshaped to fit authority."
+  },
 
-{
-id:"diary",
-x:3150,
-y:1250,
-part:1,
-title:"THE DIARY",
-text:
-"Winston secretly writes a diary. Recording his own thoughts creates a private space outside Party control."
-},
+  {
+    id:"diary",
+    x:3150,
+    y:1250,
+    part:1,
+    title:"THE DIARY",
+    text:
+      "Winston secretly writes a diary. Recording his own thoughts creates a private space outside Party control."
+  },
 
-{
-id:"memory",
-x:3420,
-y:1500,
-part:1,
-title:"MEMORY",
-text:
-"Winston's memories become important because the Party continually changes the official record."
-},
+  {
+    id:"memory",
+    x:3420,
+    y:1500,
+    part:1,
+    title:"MEMORY",
+    text:
+      "Winston's memories become important because the Party continually changes the official record."
+  },
 
-{
-id:"julia",
-x:3500,
-y:2100,
-part:2,
-title:"JULIA",
-text:
-"Julia initially appears threatening to Winston. He later discovers that she also rejects the Party, and their relationship becomes a private rebellion."
-},
+  {
+    id:"julia",
+    x:3500,
+    y:2100,
+    part:2,
+    title:"JULIA",
+    text:
+      "Julia initially appears threatening to Winston. He later discovers that she also rejects the Party, and their relationship becomes a private rebellion."
+  },
 
-{
-id:"golden-country",
-x:3200,
-y:2500,
-part:2,
-title:"THE GOLDEN COUNTRY",
-text:
-"The Golden Country represents freedom, beauty and a world beyond Party control."
-},
+  {
+    id:"golden-country",
+    x:3200,
+    y:2500,
+    part:2,
+    title:"THE GOLDEN COUNTRY",
+    text:
+      "The Golden Country represents freedom, beauty and a world beyond Party control."
+  },
 
-{
-id:"paperweight",
-x:2800,
-y:2750,
-part:2,
-title:"THE GLASS PAPERWEIGHT",
-text:
-"The glass paperweight becomes a symbol of a fragile private world and Winston's connection with the past."
-},
+  {
+    id:"paperweight",
+    x:2800,
+    y:2750,
+    part:2,
+    title:"THE GLASS PAPERWEIGHT",
+    text:
+      "The glass paperweight becomes a symbol of a fragile private world and Winston's connection with the past."
+  },
 
-{
-id:"room",
-x:2350,
-y:2850,
-part:2,
-title:"THE ROOM ABOVE THE SHOP",
-text:
-"The room seems to provide Winston and Julia with privacy. That apparent sanctuary eventually becomes part of the trap."
-},
+  {
+    id:"room",
+    x:2350,
+    y:2850,
+    part:2,
+    title:"THE ROOM ABOVE THE SHOP",
+    text:
+      "The room seems to provide Winston and Julia with privacy. That apparent sanctuary eventually becomes part of the trap."
+  },
 
-{
-id:"proles",
-x:1850,
-y:2750,
-part:2,
-title:"THE PROLES",
-text:
-"The proles form the majority of the population. Winston sees their numbers as a possible source of change."
-},
+  {
+    id:"proles",
+    x:1850,
+    y:2750,
+    part:2,
+    title:"THE PROLES",
+    text:
+      "The proles form the majority of the population. Winston sees their numbers as a possible source of change."
+  },
 
-{
-id:"brotherhood",
-x:1500,
-y:2500,
-part:2,
-title:"THE BROTHERHOOD",
-text:
-"Winston believes the Brotherhood represents organized resistance against the Party."
-},
+  {
+    id:"brotherhood",
+    x:1500,
+    y:2500,
+    part:2,
+    title:"THE BROTHERHOOD",
+    text:
+      "Winston believes the Brotherhood represents organized resistance against the Party."
+  },
 
-{
-id:"forbidden",
-x:1200,
-y:2800,
-part:2,
-title:"FORBIDDEN KNOWLEDGE",
-text:
-"Winston wants to understand how the Party gained its power and whether its version of history is true."
-},
+  {
+    id:"forbidden",
+    x:1200,
+    y:2800,
+    part:2,
+    title:"FORBIDDEN KNOWLEDGE",
+    text:
+      "Winston wants to understand how the Party gained its power and whether its version of history is true."
+  },
 
-{
-id:"war",
-x:900,
-y:3050,
-part:2,
-title:"PERMANENT WAR",
-text:
-"Continual war helps justify scarcity, fear, military priorities and the Party's permanent political structure."
-},
+  {
+    id:"war",
+    x:900,
+    y:3050,
+    part:2,
+    title:"PERMANENT WAR",
+    text:
+      "Continual war helps justify scarcity, fear, military priorities and the Party's permanent political structure."
+  },
 
-{
-id:"trap",
-x:1250,
-y:3250,
-part:3,
-title:"THE TRAP",
-text:
-"Winston and Julia's private world is not secure. Their rebellion has been observed and their refuge becomes part of the trap."
-},
+  {
+    id:"trap",
+    x:1250,
+    y:3250,
+    part:3,
+    title:"THE TRAP",
+    text:
+      "Winston and Julia's private world is not secure. Their rebellion has been observed and their refuge becomes part of the trap."
+  },
 
-{
-id:"thought-police",
-x:1700,
-y:3150,
-part:3,
-title:"THOUGHT POLICE",
-text:
-"The Thought Police enforce the Party's control. Surveillance can continue even when people believe they are acting privately."
-},
+  {
+    id:"thought-police",
+    x:1700,
+    y:3150,
+    part:3,
+    title:"THOUGHT POLICE",
+    text:
+      "The Thought Police enforce the Party's control. Surveillance can continue even when people believe they are acting privately."
+  },
 
-{
-id:"love",
-x:2100,
-y:3000,
-part:3,
-title:"MINISTRY OF LOVE",
-text:
-"The Ministry of Love is associated with detention, punishment and interrogation. Winston is taken there after his rebellion collapses."
-},
+  {
+    id:"love",
+    x:2100,
+    y:3000,
+    part:3,
+    title:"MINISTRY OF LOVE",
+    text:
+      "The Ministry of Love is associated with detention, punishment and interrogation. Winston is taken there after his rebellion collapses."
+  },
 
-{
-id:"obrien",
-x:2450,
-y:3150,
-part:3,
-title:"O'BRIEN",
-text:
-"O'Brien initially appears to Winston as someone who may understand resistance. He instead becomes a central instrument of the Party's attempt to reshape Winston's mind."
-},
+  {
+    id:"obrien",
+    x:2450,
+    y:3150,
+    part:3,
+    title:"O'BRIEN",
+    text:
+      "O'Brien initially appears to Winston as someone who may understand resistance. He instead becomes a central instrument of the Party's attempt to reshape Winston's mind."
+  },
 
-{
-id:"room101",
-x:2850,
-y:3050,
-part:3,
-title:"ROOM 101",
-text:
-"Room 101 confronts prisoners with what they fear most. Winston finally breaks when his deepest fear is used against him."
-},
+  {
+    id:"room101",
+    x:2850,
+    y:3050,
+    part:3,
+    title:"ROOM 101",
+    text:
+      "Room 101 confronts prisoners with what they fear most. Winston finally breaks when his deepest fear is used against him."
+  },
 
-{
-id:"end",
-x:3350,
-y:2850,
-part:3,
-title:"THE END",
-text:
-"Winston survives, but his resistance has been broken. The Party's control reaches into his inner beliefs."
-}
+  {
+    id:"end",
+    x:3350,
+    y:2850,
+    part:3,
+    title:"THE END",
+    text:
+      "Winston survives, but his resistance has been broken. The Party's control reaches into his inner beliefs."
+  }
 
 ];
 
-const TOTAL=
-  objects.length;
+const TOTAL =
+  discoveries.length;
 
 
 /* =========================================================
-   SAVE SYSTEM
+   SAVE
 ========================================================= */
 
-const SAVE_KEY=
-  "cican_book_quest_1984_final";
+const SAVE_KEY =
+  "cican_book_quest_1984_final_v2";
 
-let discovered=
+let discovered =
   new Set();
 
 
@@ -1248,27 +1029,24 @@ function saveGame(){
 
     localStorage.setItem(
       SAVE_KEY,
-
       JSON.stringify({
 
         discovered:
-          [...discovered],
+          Array.from(discovered),
 
         completed:
-          !!state.completed,
+          state.completed,
 
         returning:
-          !!state.returning
+          state.returning
 
       })
-
     );
 
   }catch(error){
 
     console.log(
-      "Save error:",
-      error
+      "Save unavailable"
     );
 
   }
@@ -1280,39 +1058,36 @@ function loadGame(){
 
   try{
 
-    const raw=
+    const raw =
       localStorage.getItem(
         SAVE_KEY
       );
 
-
-    if(!raw)
+    if(!raw){
       return;
+    }
 
-
-    const saved=
+    const data =
       JSON.parse(raw);
 
-
-    const validIds=
+    const valid =
       new Set(
-        objects.map(
-          obj=>obj.id
+        discoveries.map(
+          d=>d.id
         )
       );
 
-
     if(
       Array.isArray(
-        saved.discovered
+        data.discovered
       )
     ){
 
-      saved.discovered.forEach(
+      data.discovered.forEach(
         id=>{
 
           if(
-            validIds.has(id)
+            valid.has(id)
           ){
 
             discovered.add(id);
@@ -1324,21 +1099,13 @@ function loadGame(){
 
     }
 
+    state.completed =
+      data.completed === true;
 
-    state.completed=
-      saved.completed===true;
-
-
-    state.returning=
-      saved.returning===true;
-
+    state.returning =
+      data.returning === true;
 
   }catch(error){
-
-    /*
-       A damaged save must never
-       prevent the game from loading.
-    */
 
     discovered.clear();
 
@@ -1349,7 +1116,6 @@ function loadGame(){
 
 }
 
-
 loadGame();
 
 
@@ -1357,53 +1123,50 @@ loadGame();
    PROGRESS
 ========================================================= */
 
-function getProgress(){
+function progress(){
 
   return Math.floor(
-    discovered.size/
-    TOTAL*
+    discovered.size /
+    TOTAL *
     100
   );
 
 }
 
 
-function getPressure(){
+function pressure(){
 
-  return discovered.size/
+  return discovered.size /
     TOTAL;
 
 }
 
 
-function getPart(){
+function currentPart(){
 
-  let highest=1;
+  let part=1;
 
+  discoveries.forEach(
+    d=>{
 
-  for(
-    const obj
-    of objects
-  ){
+      if(
+        discovered.has(d.id)
+      ){
 
-    if(
-      discovered.has(
-        obj.id
-      )
-    ){
+        if(
+          d.part > part
+        ){
 
-      highest=
-        Math.max(
-          highest,
-          obj.part
-        );
+          part=d.part;
+
+        }
+
+      }
 
     }
+  );
 
-  }
-
-
-  return highest;
+  return part;
 
 }
 
@@ -1414,33 +1177,32 @@ function getPart(){
 
 function updateHUD(){
 
-  const pct=
-    getProgress();
-
+  const p =
+    progress();
 
   document.getElementById(
     "progressText"
-  ).textContent=
+  ).textContent =
     "UNDERSTANDING "+
-    pct+
+    p+
     "%";
-
 
   document.getElementById(
     "progressFill"
-  ).style.width=
-    pct+"%";
+  ).style.width =
+    p+
+    "%";
 
 
-  const part=
-    getPart();
+  const part =
+    currentPart();
 
 
   if(part===1){
 
     document.getElementById(
       "part"
-    ).textContent=
+    ).textContent =
       "PART I — THE WORLD";
 
   }
@@ -1448,7 +1210,7 @@ function updateHUD(){
 
     document.getElementById(
       "part"
-    ).textContent=
+    ).textContent =
       "PART II — THE REBELLION";
 
   }
@@ -1456,19 +1218,17 @@ function updateHUD(){
 
     document.getElementById(
       "part"
-    ).textContent=
+    ).textContent =
       "PART III — THE BREAKING";
 
   }
 
 
-  if(
-    pct>=100
-  ){
+  if(p>=100){
 
     document.getElementById(
       "objective"
-    ).textContent=
+    ).textContent =
       "Return to where you began.";
 
   }
@@ -1476,7 +1236,7 @@ function updateHUD(){
 
     document.getElementById(
       "objective"
-    ).textContent=
+    ).textContent =
       "Explore the city.";
 
   }
@@ -1485,7 +1245,7 @@ function updateHUD(){
 
 
 /* =========================================================
-   PLAYER
+   MOVEMENT
 ========================================================= */
 
 function updatePlayer(){
@@ -1494,11 +1254,12 @@ function updatePlayer(){
     !state.started ||
     state.storyOpen ||
     state.completed
-  )
+  ){
     return;
+  }
 
 
-  const strength=
+  const strength =
     Math.sqrt(
       joyX*joyX+
       joyY*joyY
@@ -1509,20 +1270,13 @@ function updatePlayer(){
     strength>.08
   ){
 
-    player.vx+=
+    player.vx +=
       joyX*
       player.acceleration;
 
-    player.vy+=
+    player.vy +=
       joyY*
       player.acceleration;
-
-
-    player.directionX=
-      joyX;
-
-    player.directionY=
-      joyY;
 
     player.walking=true;
 
@@ -1534,14 +1288,14 @@ function updatePlayer(){
   }
 
 
-  player.vx*=
+  player.vx *=
     player.friction;
 
-  player.vy*=
+  player.vy *=
     player.friction;
 
 
-  const velocity=
+  const speed =
     Math.sqrt(
       player.vx*
       player.vx+
@@ -1551,56 +1305,66 @@ function updatePlayer(){
 
 
   if(
-    velocity>
-    player.speed
+    speed > player.speed
   ){
 
-    player.vx=
+    player.vx =
       player.vx/
-      velocity*
+      speed*
       player.speed;
 
-    player.vy=
+    player.vy =
       player.vy/
-      velocity*
+      speed*
       player.speed;
 
   }
 
 
-  player.x+=
+  player.x +=
     player.vx;
 
-  player.y+=
+  player.y +=
     player.vy;
 
 
-  const margin=45;
-
-
-  player.x=
-    Math.max(
-      margin,
-      Math.min(
-        WORLD_W-margin,
-        player.x
-      )
-    );
-
-
-  player.y=
-    Math.max(
-      margin,
-      Math.min(
-        WORLD_H-margin,
-        player.y
-      )
-    );
+  const edge=45;
 
 
   if(
-    player.walking
+    player.x<edge
   ){
+    player.x=edge;
+    player.vx=0;
+  }
+
+  if(
+    player.x>
+    WORLD_WIDTH-edge
+  ){
+    player.x=
+      WORLD_WIDTH-edge;
+    player.vx=0;
+  }
+
+  if(
+    player.y<edge
+  ){
+    player.y=edge;
+    player.vy=0;
+  }
+
+  if(
+    player.y>
+    WORLD_HEIGHT-edge
+  ){
+    player.y=
+      WORLD_HEIGHT-edge;
+    player.vy=0;
+  }
+
+
+  if(player.walking){
 
     player.animation+=.18;
 
@@ -1618,20 +1382,20 @@ function updateCompanion(){
   if(
     !state.started ||
     state.storyOpen
-  )
+  ){
     return;
+  }
 
 
-  const dx=
+  const dx =
     player.x-
     companion.x;
 
-  const dy=
+  const dy =
     player.y-
     companion.y;
 
-
-  const distance=
+  const distance =
     Math.sqrt(
       dx*dx+
       dy*dy
@@ -1639,20 +1403,17 @@ function updateCompanion(){
 
 
   if(
-    distance>110
+    distance>105
   ){
 
-    /*
-       The companion always remains
-       a little behind the player.
-    */
-
-    companion.x+=
-      dx/distance*
+    companion.x +=
+      dx/
+      distance*
       .65;
 
-    companion.y+=
-      dy/distance*
+    companion.y +=
+      dy/
+      distance*
       .65;
 
     companion.animation+=.08;
@@ -1668,30 +1429,42 @@ function updateCompanion(){
 
 function updateCamera(){
 
-  camera.x=
+  camera.x =
     player.x-
     W/2;
 
-  camera.y=
+  camera.y =
     player.y-
     H/2;
 
 
-  camera.x=
+  const maxX =
+    Math.max(
+      0,
+      WORLD_WIDTH-W
+    );
+
+  const maxY =
+    Math.max(
+      0,
+      WORLD_HEIGHT-H
+    );
+
+
+  camera.x =
     Math.max(
       0,
       Math.min(
-        WORLD_W-W,
+        maxX,
         camera.x
       )
     );
 
-
-  camera.y=
+  camera.y =
     Math.max(
       0,
       Math.min(
-        WORLD_H-H,
+        maxY,
         camera.y
       )
     );
@@ -1700,406 +1473,21 @@ function updateCamera(){
 
 
 /* =========================================================
-   DISCOVERY
+   WORLD COORDINATES
 ========================================================= */
 
-function openDiscovery(obj){
+function screenPosition(
+  x,
+  y
+){
 
-  state.storyOpen=true;
+  return {
 
-  resetStick();
+    x:x-camera.x,
 
+    y:y-camera.y
 
-  document.getElementById(
-    "storyTitle"
-  ).textContent=
-    obj.title;
-
-
-  document.getElementById(
-    "storyText"
-  ).textContent=
-    obj.text;
-
-
-  document.getElementById(
-    "storyOverlay"
-  ).style.display=
-    "flex";
-
-}
-
-
-function checkDiscoveries(){
-
-  if(
-    state.storyOpen ||
-    state.completed
-  )
-    return;
-
-
-  for(
-    const obj
-    of objects
-  ){
-
-    if(
-      discovered.has(
-        obj.id
-      )
-    )
-      continue;
-
-
-    const dx=
-      player.x-
-      obj.x;
-
-    const dy=
-      player.y-
-      obj.y;
-
-
-    const distance=
-      Math.sqrt(
-        dx*dx+
-        dy*dy
-      );
-
-
-    if(
-      distance<75
-    ){
-
-      discovered.add(
-        obj.id
-      );
-
-
-      /*
-         Every discovery immediately
-         changes the world.
-      */
-
-      saveGame();
-
-      updateHUD();
-
-      openDiscovery(
-        obj
-      );
-
-      return;
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   CONTINUE
-========================================================= */
-
-document.getElementById(
-  "continueButton"
-)
-.addEventListener(
-  "click",
-  function(){
-
-    state.storyOpen=false;
-
-    document.getElementById(
-      "storyOverlay"
-    ).style.display=
-      "none";
-
-
-    /*
-       Save again after the player
-       leaves the discovery screen.
-    */
-
-    saveGame();
-
-  }
-);
-
-
-/* =========================================================
-   BUILDINGS
-========================================================= */
-
-/*
-   IMPORTANT:
-
-   These are deliberately visual.
-
-   The player is NOT trapped by them.
-
-   Freedom of movement is part of
-   the CICAN BOOK QUEST identity.
-*/
-
-const buildings=[
-
-{
-x:150,
-y:180,
-w:650,
-h:500,
-name:"VICTORY MANSIONS"
-},
-
-{
-x:980,
-y:120,
-w:600,
-h:620,
-name:"MINISTRY DISTRICT"
-},
-
-{
-x:1740,
-y:180,
-w:650,
-h:520,
-name:"PUBLIC RECORDS"
-},
-
-{
-x:2600,
-y:100,
-w:720,
-h:650,
-name:"PARTY DISTRICT"
-},
-
-{
-x:3400,
-y:300,
-w:620,
-h:500,
-name:"RESIDENTIAL BLOCKS"
-},
-
-{
-x:120,
-y:1050,
-w:700,
-h:520,
-name:"WORKERS DISTRICT"
-},
-
-{
-x:1020,
-y:950,
-w:570,
-h:650,
-name:"TELESCREEN CENTRE"
-},
-
-{
-x:1800,
-y:980,
-w:700,
-h:500,
-name:"MINISTRY OF TRUTH"
-},
-
-{
-x:2750,
-y:920,
-w:850,
-h:600,
-name:"ADMINISTRATION"
-},
-
-{
-x:200,
-y:1900,
-w:620,
-h:500,
-name:"PROLE DISTRICT"
-},
-
-{
-x:1050,
-y:1820,
-w:600,
-h:600,
-name:"PUBLIC SQUARE"
-},
-
-{
-x:1830,
-y:1750,
-w:720,
-h:570,
-name:"ARCHIVES"
-},
-
-{
-x:2750,
-y:1800,
-w:780,
-h:520,
-name:"PARTY HOUSING"
-},
-
-{
-x:120,
-y:2750,
-w:680,
-h:480,
-name:"INDUSTRIAL ZONE"
-},
-
-{
-x:950,
-y:2550,
-w:700,
-h:600,
-name:"SECURITY DISTRICT"
-},
-
-{
-x:1800,
-y:2500,
-w:620,
-h:600,
-name:"MINISTRY OF LOVE"
-},
-
-{
-x:2600,
-y:2500,
-w:850,
-h:550,
-name:"DETENTION COMPLEX"
-},
-
-{
-x:3600,
-y:2450,
-w:450,
-h:600,
-name:"RESTRICTED AREA"
-}
-
-];
-
-
-function drawBuildings(){
-
-  const p=
-    getPressure();
-
-
-  for(
-    const b
-    of buildings
-  ){
-
-    const s=
-      worldToScreen(
-        b.x,
-        b.y
-      );
-
-
-    ctx.fillStyle=
-      p>.65
-        ? "#101216"
-        : "#1c1f24";
-
-
-    ctx.fillRect(
-      s.x,
-      s.y,
-      b.w,
-      b.h
-    );
-
-
-    ctx.strokeStyle=
-      p>.65
-        ? "#3d2528"
-        : "#40454b";
-
-
-    ctx.lineWidth=3;
-
-
-    ctx.strokeRect(
-      s.x,
-      s.y,
-      b.w,
-      b.h
-    );
-
-
-    /*
-       Windows become increasingly
-       ominous as the player learns.
-    */
-
-    ctx.fillStyle=
-      p>.4
-        ? "rgba(120,25,25,.38)"
-        : "rgba(170,175,180,.12)";
-
-
-    const cols=
-      Math.floor(
-        b.w/85
-      );
-
-    const rows=
-      Math.floor(
-        b.h/85
-      );
-
-
-    for(
-      let ix=0;
-      ix<cols;
-      ix++
-    ){
-
-      for(
-        let iy=0;
-        iy<rows;
-        iy++
-      ){
-
-        ctx.fillRect(
-          s.x+20+ix*85,
-          s.y+22+iy*85,
-          24,
-          30
-        );
-
-      }
-
-    }
-
-
-    ctx.fillStyle=
-      "rgba(255,255,255,.38)";
-
-
-    text(
-      b.name,
-      b.x+b.w/2,
-      b.y+25,
-      10
-    );
-
-  }
+  };
 
 }
 
@@ -2110,8 +1498,8 @@ function drawBuildings(){
 
 function drawGround(){
 
-  const p=
-    getPressure();
+  const p =
+    pressure();
 
 
   let ground;
@@ -2129,9 +1517,8 @@ function drawGround(){
     ground="#18191d";
 
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     ground;
-
 
   ctx.fillRect(
     0,
@@ -2142,14 +1529,67 @@ function drawGround(){
 
 
   /*
-     Street grid.
+     Streets.
   */
 
-  ctx.strokeStyle=
+  ctx.fillStyle =
+    p>.65
+      ? "#15161a"
+      : "#222428";
+
+
+  for(
+    let y=400;
+    y<WORLD_HEIGHT;
+    y+=900
+  ){
+
+    const s =
+      screenPosition(
+        0,
+        y
+      );
+
+    ctx.fillRect(
+      s.x,
+      s.y,
+      WORLD_WIDTH,
+      120
+    );
+
+  }
+
+
+  for(
+    let x=400;
+    x<WORLD_WIDTH;
+    x+=1100
+  ){
+
+    const s =
+      screenPosition(
+        x,
+        0
+      );
+
+    ctx.fillRect(
+      s.x,
+      s.y,
+      120,
+      WORLD_HEIGHT
+    );
+
+  }
+
+
+  /*
+     Subtle grid.
+  */
+
+  ctx.strokeStyle =
     "rgba(255,255,255,"+
     (.045-p*.025)+
     ")";
-
 
   ctx.lineWidth=1;
 
@@ -2164,14 +1604,15 @@ function drawGround(){
       )*grid;
 
     x<
-      camera.x+W+grid;
+      camera.x+
+      W+
+      grid;
 
     x+=grid
   ){
 
-    const sx=
+    const sx =
       x-camera.x;
-
 
     ctx.beginPath();
 
@@ -2197,14 +1638,15 @@ function drawGround(){
       )*grid;
 
     y<
-      camera.y+H+grid;
+      camera.y+
+      H+
+      grid;
 
     y+=grid
   ){
 
-    const sy=
+    const sy =
       y-camera.y;
-
 
     ctx.beginPath();
 
@@ -2222,61 +1664,154 @@ function drawGround(){
 
   }
 
-
-  /*
-     Roads.
-  */
-
-  ctx.fillStyle=
-    p>.65
-      ? "#15161a"
-      : "#222428";
+}
 
 
-  for(
-    let y=400;
-    y<WORLD_H;
-    y+=900
-  ){
+/* =========================================================
+   BUILDINGS
+========================================================= */
 
-    const s=
-      worldToScreen(
-        0,
-        y
+const buildings = [
+
+  [150,180,650,500,"VICTORY MANSIONS"],
+  [980,120,600,620,"MINISTRY DISTRICT"],
+  [1740,180,650,520,"PUBLIC RECORDS"],
+  [2600,100,720,650,"PARTY DISTRICT"],
+  [3400,300,620,500,"RESIDENTIAL BLOCKS"],
+
+  [120,1050,700,520,"WORKERS DISTRICT"],
+  [1020,950,570,650,"TELESCREEN CENTRE"],
+  [1800,980,700,500,"MINISTRY OF TRUTH"],
+  [2750,920,850,600,"ADMINISTRATION"],
+
+  [200,1900,620,500,"PROLE DISTRICT"],
+  [1050,1820,600,600,"PUBLIC SQUARE"],
+  [1830,1750,720,570,"ARCHIVES"],
+  [2750,1800,780,520,"PARTY HOUSING"],
+
+  [120,2750,680,480,"INDUSTRIAL ZONE"],
+  [950,2550,700,600,"SECURITY DISTRICT"],
+  [1800,2500,620,600,"MINISTRY OF LOVE"],
+  [2600,2500,850,550,"DETENTION COMPLEX"],
+  [3600,2450,450,600,"RESTRICTED AREA"]
+
+];
+
+
+function drawBuildings(){
+
+  const p =
+    pressure();
+
+
+  buildings.forEach(
+    b=>{
+
+      const x=b[0];
+      const y=b[1];
+      const w=b[2];
+      const h=b[3];
+      const name=b[4];
+
+
+      const s =
+        screenPosition(
+          x,
+          y
+        );
+
+
+      ctx.fillStyle =
+        p>.65
+          ? "#101216"
+          : "#1c1f24";
+
+
+      ctx.fillRect(
+        s.x,
+        s.y,
+        w,
+        h
       );
 
 
-    ctx.fillRect(
-      s.x,
-      s.y,
-      WORLD_W,
-      120
-    );
-
-  }
+      ctx.strokeStyle =
+        p>.65
+          ? "#3d2528"
+          : "#40454b";
 
 
-  for(
-    let x=400;
-    x<WORLD_W;
-    x+=1100
-  ){
+      ctx.lineWidth=3;
 
-    const s=
-      worldToScreen(
-        x,
-        0
+
+      ctx.strokeRect(
+        s.x,
+        s.y,
+        w,
+        h
       );
 
 
-    ctx.fillRect(
-      s.x,
-      s.y,
-      120,
-      WORLD_H
-    );
+      /*
+         Windows.
+      */
 
-  }
+      ctx.fillStyle =
+        p>.4
+          ? "rgba(120,25,25,.38)"
+          : "rgba(170,175,180,.12)";
+
+
+      const cols =
+        Math.floor(w/85);
+
+      const rows =
+        Math.floor(h/85);
+
+
+      for(
+        let ix=0;
+        ix<cols;
+        ix++
+      ){
+
+        for(
+          let iy=0;
+          iy<rows;
+          iy++
+        ){
+
+          ctx.fillRect(
+            s.x+
+            20+
+            ix*85,
+
+            s.y+
+            22+
+            iy*85,
+
+            24,
+            30
+          );
+
+        }
+
+      }
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,.35)";
+
+
+      drawText(
+        name,
+        x+w/2,
+        y+25,
+        10
+      );
+
+    }
+  );
 
 }
 
@@ -2285,70 +1820,28 @@ function drawGround(){
    PROPAGANDA
 ========================================================= */
 
-const signs=[
+const signs = [
 
-{
-x:450,
-y:900,
-title:"BIG BROTHER",
-sub:"IS WATCHING YOU"
-},
+  [450,900,"BIG BROTHER","IS WATCHING YOU"],
 
-{
-x:2450,
-y:820,
-title:"WAR IS PEACE",
-sub:"FREEDOM IS SLAVERY"
-},
+  [2450,820,"WAR IS PEACE","FREEDOM IS SLAVERY"],
 
-{
-x:3650,
-y:1050,
-title:"IGNORANCE",
-sub:"IS STRENGTH"
-},
+  [3650,1050,"IGNORANCE","IS STRENGTH"],
 
-{
-x:820,
-y:1700,
-title:"TRUTH",
-sub:"BELONGS TO THE PARTY"
-},
+  [820,1700,"TRUTH","BELONGS TO THE PARTY"],
 
-{
-x:3300,
-y:1700,
-title:"2 + 2",
-sub:"= 5"
-},
+  [3300,1700,"2 + 2","= 5"],
 
-{
-x:1550,
-y:800,
-title:"THE PARTY",
-sub:"IS ALWAYS RIGHT"
-},
+  [1550,800,"THE PARTY","IS ALWAYS RIGHT"],
 
-{
-x:3650,
-y:1900,
-title:"WATCH",
-sub:"YOUR THOUGHTS"
-}
+  [3650,1900,"WATCH","YOUR THOUGHTS"]
 
 ];
 
 
 function drawPropaganda(){
 
-  /*
-     Every few discoveries reveal
-     another layer of propaganda.
-
-     At 100%, everything is visible.
-  */
-
-  const count=
+  const amount =
     Math.min(
       signs.length,
       1+
@@ -2361,22 +1854,22 @@ function drawPropaganda(){
 
   for(
     let i=0;
-    i<count;
+    i<amount;
     i++
   ){
 
-    const sign=
+    const sign =
       signs[i];
 
 
-    const s=
-      worldToScreen(
-        sign.x,
-        sign.y
+    const s =
+      screenPosition(
+        sign[0],
+        sign[1]
       );
 
 
-    ctx.fillStyle=
+    ctx.fillStyle =
       "rgba(85,15,18,.82)";
 
 
@@ -2388,7 +1881,7 @@ function drawPropaganda(){
     );
 
 
-    ctx.strokeStyle=
+    ctx.strokeStyle =
       "#642a2d";
 
 
@@ -2400,22 +1893,18 @@ function drawPropaganda(){
     );
 
 
-    ctx.fillStyle=
-      "#eee";
-
-
-    text(
-      sign.title,
-      sign.x,
-      sign.y-14,
+    drawText(
+      sign[2],
+      sign[0],
+      sign[1]-14,
       14
     );
 
 
-    text(
-      sign.sub,
-      sign.x,
-      sign.y+17,
+    drawText(
+      sign[3],
+      sign[0],
+      sign[1]+17,
       10
     );
 
@@ -2432,18 +1921,18 @@ function drawLamps(){
 
   for(
     let x=250;
-    x<WORLD_W;
+    x<WORLD_WIDTH;
     x+=420
   ){
 
     for(
       let y=300;
-      y<WORLD_H;
+      y<WORLD_HEIGHT;
       y+=700
     ){
 
-      const s=
-        worldToScreen(
+      const s =
+        screenPosition(
           x,
           y
         );
@@ -2454,11 +1943,12 @@ function drawLamps(){
         s.x>W+40 ||
         s.y<-40 ||
         s.y>H+40
-      )
+      ){
         continue;
+      }
 
 
-      ctx.strokeStyle=
+      ctx.strokeStyle =
         "#33363b";
 
       ctx.lineWidth=5;
@@ -2479,7 +1969,7 @@ function drawLamps(){
       ctx.stroke();
 
 
-      ctx.fillStyle=
+      ctx.fillStyle =
         "#e8bd53";
 
 
@@ -2489,45 +1979,6 @@ function drawLamps(){
         s.x,
         s.y,
         7,
-        0,
-        Math.PI*2
-      );
-
-      ctx.fill();
-
-
-      const glow=
-        ctx.createRadialGradient(
-          s.x,
-          s.y,
-          2,
-          s.x,
-          s.y,
-          55
-        );
-
-
-      glow.addColorStop(
-        0,
-        "rgba(241,200,75,.16)"
-      );
-
-      glow.addColorStop(
-        1,
-        "rgba(241,200,75,0)"
-      );
-
-
-      ctx.fillStyle=
-        glow;
-
-
-      ctx.beginPath();
-
-      ctx.arc(
-        s.x,
-        s.y,
-        55,
         0,
         Math.PI*2
       );
@@ -2547,17 +1998,13 @@ function drawLamps(){
 
 function drawCameras(){
 
-  /*
-     Surveillance density grows continuously
-     with understanding.
-  */
-
-  const count=
+  const count =
     Math.min(
       30,
       2+
       Math.floor(
-        discovered.size/1.5
+        discovered.size/
+        1.5
       )
     );
 
@@ -2568,17 +2015,17 @@ function drawCameras(){
     i++
   ){
 
-    const x=
+    const x =
       350+
       ((i*617)%3400);
 
-    const y=
+    const y =
       250+
       ((i*431)%2850);
 
 
-    const s=
-      worldToScreen(
+    const s =
+      screenPosition(
         x,
         y
       );
@@ -2589,11 +2036,12 @@ function drawCameras(){
       s.x>W+80 ||
       s.y<-80 ||
       s.y>H+80
-    )
+    ){
       continue;
+    }
 
 
-    ctx.fillStyle=
+    ctx.fillStyle =
       "#171a1e";
 
 
@@ -2605,7 +2053,7 @@ function drawCameras(){
     );
 
 
-    ctx.fillStyle=
+    ctx.fillStyle =
       "#d34d4d";
 
 
@@ -2622,12 +2070,12 @@ function drawCameras(){
     ctx.fill();
 
 
-    const beam=
-      .04+
-      getPressure()*.10;
+    const beam =
+      .035+
+      pressure()*.10;
 
 
-    ctx.fillStyle=
+    ctx.fillStyle =
       "rgba(180,35,35,"+
       beam+
       ")";
@@ -2660,7 +2108,7 @@ function drawCameras(){
 
 
 /* =========================================================
-   NPC POPULATION
+   NPCs / SHADOW FIGURES
 ========================================================= */
 
 const npcs=[];
@@ -2699,87 +2147,69 @@ function updateNPCs(){
   if(
     !state.started ||
     state.storyOpen
-  )
-    return;
-
-
-  const p=
-    getPressure();
-
-
-  for(
-    const npc
-    of npcs
   ){
-
-    npc.phase+=
-      .003+
-      p*.003;
-
-
-    /*
-       Later stages create more
-       controlled movement.
-    */
-
-    npc.x+=
-      Math.cos(
-        npc.phase
-      )*
-      npc.speed;
-
-    npc.y+=
-      Math.sin(
-        npc.phase*1.7
-      )*
-      npc.speed;
-
-
-    npc.x=
-      Math.max(
-        60,
-        Math.min(
-          WORLD_W-60,
-          npc.x
-        )
-      );
-
-
-    npc.y=
-      Math.max(
-        60,
-        Math.min(
-          WORLD_H-60,
-          npc.y
-        )
-      );
-
+    return;
   }
+
+
+  const p =
+    pressure();
+
+
+  npcs.forEach(
+    npc=>{
+
+      npc.phase +=
+        .003+
+        p*.003;
+
+
+      npc.x +=
+        Math.cos(
+          npc.phase
+        )*
+        npc.speed;
+
+
+      npc.y +=
+        Math.sin(
+          npc.phase*1.7
+        )*
+        npc.speed;
+
+
+      npc.x =
+        Math.max(
+          60,
+          Math.min(
+            WORLD_WIDTH-60,
+            npc.x
+          )
+        );
+
+
+      npc.y =
+        Math.max(
+          60,
+          Math.min(
+            WORLD_HEIGHT-60,
+            npc.y
+          )
+        );
+
+    }
+  );
 
 }
 
 
 function drawNPCs(){
 
-  /*
-     Population changes with the story.
-
-     Early:
-     ordinary citizens.
-
-     Middle:
-     citizens + controlled figures.
-
-     Late:
-     more officers,
-     fewer relaxed-looking people.
-  */
-
-  const p=
-    getPressure();
+  const p =
+    pressure();
 
 
-  const visible=
+  const count =
     Math.min(
       60,
       12+
@@ -2791,35 +2221,36 @@ function drawNPCs(){
 
   for(
     let i=0;
-    i<visible;
+    i<count;
     i++
   ){
 
-    const npc=
+    const npc =
       npcs[i];
 
 
-    const s=
-      worldToScreen(
+    const s =
+      screenPosition(
         npc.x,
         npc.y
       );
 
 
     if(
-      s.x<-40 ||
-      s.x>W+40 ||
-      s.y<-50 ||
-      s.y>H+50
-    )
+      s.x<-30 ||
+      s.x>W+30 ||
+      s.y<-40 ||
+      s.y>H+40
+    ){
       continue;
+    }
 
 
     /*
-       Head.
+       Shadow-like figure.
     */
 
-    ctx.fillStyle=
+    ctx.fillStyle =
       "#111316";
 
 
@@ -2836,14 +2267,6 @@ function drawNPCs(){
     ctx.fill();
 
 
-    /*
-       Body.
-    */
-
-    ctx.fillStyle=
-      "#15181c";
-
-
     ctx.fillRect(
       s.x-7,
       s.y-4,
@@ -2853,7 +2276,7 @@ function drawNPCs(){
 
 
     /*
-       Controlled officers gradually appear.
+       Officers appear later.
     */
 
     if(
@@ -2861,8 +2284,8 @@ function drawNPCs(){
       i%4===0
     ){
 
-      ctx.fillStyle=
-        "#272b30";
+      ctx.fillStyle =
+        "#292d32";
 
 
       ctx.fillRect(
@@ -2873,7 +2296,7 @@ function drawNPCs(){
       );
 
 
-      ctx.fillStyle=
+      ctx.fillStyle =
         "#8b292d";
 
 
@@ -2895,21 +2318,17 @@ function drawNPCs(){
    ENVIRONMENTAL STORY
 ========================================================= */
 
-function drawEnvironmentalStory(){
+function drawEnvironment(){
 
-  const p=
-    getPressure();
+  const p =
+    pressure();
 
-
-  /*
-     Early understanding.
-  */
 
   if(
     p>.08
   ){
 
-    text(
+    drawText(
       "BIG BROTHER IS WATCHING YOU",
       2100,
       760,
@@ -2918,10 +2337,6 @@ function drawEnvironmentalStory(){
 
   }
 
-
-  /*
-     Records / destroyed information.
-  */
 
   if(
     p>.28
@@ -2933,23 +2348,23 @@ function drawEnvironmentalStory(){
       i++
     ){
 
-      const x=
+      const x =
         1400+
         ((i*317)%1500);
 
-      const y=
+      const y =
         1150+
         ((i*191)%1100);
 
 
-      const s=
-        worldToScreen(
+      const s =
+        screenPosition(
           x,
           y
         );
 
 
-      ctx.fillStyle=
+      ctx.fillStyle =
         "rgba(210,210,210,.35)";
 
 
@@ -2965,24 +2380,16 @@ function drawEnvironmentalStory(){
   }
 
 
-  /*
-     More red atmosphere.
-  */
-
   if(
     p>.55
   ){
 
-    const pulse=
-      .055+
+    ctx.fillStyle =
+      "rgba(130,0,0,"+
+      (.05+
       Math.sin(
         Date.now()/300
-      )*.02;
-
-
-    ctx.fillStyle=
-      "rgba(130,0,0,"+
-      pulse+
+      )*.015)+
       ")";
 
 
@@ -2996,16 +2403,12 @@ function drawEnvironmentalStory(){
   }
 
 
-  /*
-     Final psychological pressure.
-  */
-
   if(
     p>.80
   ){
 
-    ctx.fillStyle=
-      "rgba(0,0,0,.055)";
+    ctx.fillStyle =
+      "rgba(0,0,0,.05)";
 
 
     ctx.fillRect(
@@ -3024,88 +2427,89 @@ function drawEnvironmentalStory(){
    DISCOVERY MARKERS
 ========================================================= */
 
-function drawStoryObjects(){
+function drawDiscoveryMarkers(){
 
-  for(
-    const obj
-    of objects
-  ){
+  discoveries.forEach(
+    d=>{
 
-    if(
-      discovered.has(
-        obj.id
-      )
-    )
-      continue;
+      if(
+        discovered.has(
+          d.id
+        )
+      ){
+        return;
+      }
 
 
-    const s=
-      worldToScreen(
-        obj.x,
-        obj.y
+      const s =
+        screenPosition(
+          d.x,
+          d.y
+        );
+
+
+      if(
+        s.x<-60 ||
+        s.x>W+60 ||
+        s.y<-60 ||
+        s.y>H+60
+      ){
+        return;
+      }
+
+
+      const pulse =
+        1+
+        Math.sin(
+          Date.now()/300
+        )*.12;
+
+
+      ctx.strokeStyle =
+        "rgba(241,200,75,.8)";
+
+      ctx.lineWidth=2;
+
+
+      ctx.beginPath();
+
+      ctx.arc(
+        s.x,
+        s.y,
+        25*pulse,
+        0,
+        Math.PI*2
       );
 
-
-    if(
-      s.x<-60 ||
-      s.x>W+60 ||
-      s.y<-60 ||
-      s.y>H+60
-    )
-      continue;
+      ctx.stroke();
 
 
-    const pulse=
-      1+
-      Math.sin(
-        Date.now()/300
-      )*.12;
+      ctx.fillStyle =
+        "#f1c84b";
 
 
-    ctx.strokeStyle=
-      "rgba(241,200,75,.8)";
+      ctx.beginPath();
 
-    ctx.lineWidth=2;
+      ctx.arc(
+        s.x,
+        s.y,
+        6,
+        0,
+        Math.PI*2
+      );
 
-
-    ctx.beginPath();
-
-    ctx.arc(
-      s.x,
-      s.y,
-      25*pulse,
-      0,
-      Math.PI*2
-    );
-
-    ctx.stroke();
+      ctx.fill();
 
 
-    ctx.fillStyle=
-      "#f1c84b";
+      drawText(
+        "DISCOVER",
+        d.x,
+        d.y+37,
+        9
+      );
 
-
-    ctx.beginPath();
-
-    ctx.arc(
-      s.x,
-      s.y,
-      6,
-      0,
-      Math.PI*2
-    );
-
-    ctx.fill();
-
-
-    text(
-      "DISCOVER",
-      obj.x,
-      obj.y+37,
-      9
-    );
-
-  }
+    }
+  );
 
 }
 
@@ -3114,12 +2518,10 @@ function drawStoryObjects(){
    BOOK
 ========================================================= */
 
-const book={
+const book = {
 
   x:START_X,
-  y:START_Y,
-
-  radius:28
+  y:START_Y
 
 };
 
@@ -3128,12 +2530,13 @@ function drawBook(){
 
   if(
     state.completed
-  )
+  ){
     return;
+  }
 
 
-  const s=
-    worldToScreen(
+  const s =
+    screenPosition(
       book.x,
       book.y
     );
@@ -3141,23 +2544,16 @@ function drawBook(){
 
   ctx.save();
 
-
   ctx.translate(
     s.x,
     s.y
   );
 
-
   ctx.rotate(-.08);
 
 
-  /*
-     The book becomes gold only
-     after the experience is complete.
-  */
-
-  ctx.fillStyle=
-    getProgress()>=100
+  ctx.fillStyle =
+    progress()>=100
       ? "#f1c84b"
       : "#765d31";
 
@@ -3170,7 +2566,7 @@ function drawBook(){
   );
 
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#151719";
 
 
@@ -3182,14 +2578,14 @@ function drawBook(){
   );
 
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#f1c84b";
 
 
-  ctx.font=
+  ctx.font =
     "bold 9px Arial";
 
-  ctx.textAlign=
+  ctx.textAlign =
     "center";
 
 
@@ -3203,15 +2599,11 @@ function drawBook(){
   ctx.restore();
 
 
-  /*
-     Final return marker.
-  */
-
   if(
-    getProgress()>=100
+    progress()>=100
   ){
 
-    const pulse=
+    const pulse =
       40+
       Math.sin(
         Date.now()/250
@@ -3219,7 +2611,7 @@ function drawBook(){
       7;
 
 
-    ctx.strokeStyle=
+    ctx.strokeStyle =
       "rgba(241,200,75,.85)";
 
     ctx.lineWidth=3;
@@ -3238,7 +2630,7 @@ function drawBook(){
     ctx.stroke();
 
 
-    text(
+    drawText(
       "RETURN HERE",
       book.x,
       book.y+55,
@@ -3254,16 +2646,16 @@ function drawBook(){
    PLAYER BALL
 ========================================================= */
 
-function drawBallCharacter(){
+function drawPlayer(){
 
-  const s=
-    worldToScreen(
+  const s =
+    screenPosition(
       player.x,
       player.y
     );
 
 
-  const bounce=
+  const bounce =
     player.walking
       ?
         Math.sin(
@@ -3277,7 +2669,7 @@ function drawBallCharacter(){
      Shadow.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "rgba(0,0,0,.42)";
 
 
@@ -3297,10 +2689,10 @@ function drawBallCharacter(){
 
 
   /*
-     Ball gradient.
+     Ball.
   */
 
-  const gradient=
+  const gradient =
     ctx.createRadialGradient(
       s.x-6,
       s.y-8+bounce,
@@ -3314,7 +2706,7 @@ function drawBallCharacter(){
 
   gradient.addColorStop(
     0,
-    "#ffffff"
+    "#fff"
   );
 
   gradient.addColorStop(
@@ -3328,7 +2720,7 @@ function drawBallCharacter(){
   );
 
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     gradient;
 
 
@@ -3345,11 +2737,7 @@ function drawBallCharacter(){
   ctx.fill();
 
 
-  /*
-     Outline.
-  */
-
-  ctx.strokeStyle=
+  ctx.strokeStyle =
     "#16191d";
 
   ctx.lineWidth=2;
@@ -3361,7 +2749,7 @@ function drawBallCharacter(){
      Eyes.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#111";
 
 
@@ -3399,7 +2787,7 @@ function drawBallCharacter(){
      Eye highlights.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#fff";
 
 
@@ -3432,19 +2820,19 @@ function drawBallCharacter(){
 
 
 /* =========================================================
-   FOLLOWING HUMAN
+   COMPANION
 ========================================================= */
 
 function drawCompanion(){
 
-  const s=
-    worldToScreen(
+  const s =
+    screenPosition(
       companion.x,
       companion.y
     );
 
 
-  const step=
+  const step =
     Math.sin(
       companion.animation
     )*2;
@@ -3454,7 +2842,7 @@ function drawCompanion(){
      Shadow.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "rgba(0,0,0,.4)";
 
 
@@ -3477,7 +2865,7 @@ function drawCompanion(){
      Legs.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#16181c";
 
 
@@ -3487,7 +2875,6 @@ function drawCompanion(){
     5,
     15+step
   );
-
 
   ctx.fillRect(
     s.x+2,
@@ -3501,7 +2888,7 @@ function drawCompanion(){
      Body.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#28313a";
 
 
@@ -3517,7 +2904,7 @@ function drawCompanion(){
      Head.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#c49b78";
 
 
@@ -3538,7 +2925,7 @@ function drawCompanion(){
      Hair.
   */
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#171719";
 
 
@@ -3558,34 +2945,36 @@ function drawCompanion(){
 
 
 /* =========================================================
-   TEXT HELPER
+   TEXT
 ========================================================= */
 
-function text(
+function drawText(
   value,
   x,
   y,
   size
 ){
 
-  const s=
-    worldToScreen(
+  const s =
+    screenPosition(
       x,
       y
     );
 
 
-  ctx.font=
+  ctx.font =
     "bold "+
     size+
     "px Arial";
 
-
-  ctx.textAlign=
+  ctx.textAlign =
     "center";
 
-  ctx.textBaseline=
+  ctx.textBaseline =
     "middle";
+
+  ctx.fillStyle =
+    "#fff";
 
 
   ctx.fillText(
@@ -3598,41 +2987,168 @@ function text(
 
 
 /* =========================================================
-   RETURN TO START
+   DISCOVERY CHECK
+========================================================= */
+
+function checkDiscoveries(){
+
+  if(
+    state.storyOpen ||
+    state.completed
+  ){
+    return;
+  }
+
+
+  for(
+    let i=0;
+    i<discoveries.length;
+    i++
+  ){
+
+    const d =
+      discoveries[i];
+
+
+    if(
+      discovered.has(
+        d.id
+      )
+    ){
+      continue;
+    }
+
+
+    const dx =
+      player.x-d.x;
+
+    const dy =
+      player.y-d.y;
+
+
+    const distance =
+      Math.sqrt(
+        dx*dx+
+        dy*dy
+      );
+
+
+    if(
+      distance<75
+    ){
+
+      discovered.add(
+        d.id
+      );
+
+
+      saveGame();
+
+      updateHUD();
+
+      showDiscovery(
+        d
+      );
+
+      return;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   DISCOVERY SCREEN
+========================================================= */
+
+function showDiscovery(d){
+
+  state.storyOpen=true;
+
+  resetJoystick();
+
+
+  document.getElementById(
+    "discoveryTitle"
+  ).textContent =
+    d.title;
+
+
+  document.getElementById(
+    "discoveryText"
+  ).textContent =
+    d.text;
+
+
+  document.getElementById(
+    "storyOverlay"
+  ).style.display =
+    "flex";
+
+}
+
+
+/* =========================================================
+   CONTINUE
+========================================================= */
+
+document.getElementById(
+  "continueButton"
+)
+.addEventListener(
+  "click",
+  function(){
+
+    state.storyOpen=false;
+
+
+    document.getElementById(
+      "storyOverlay"
+    ).style.display =
+      "none";
+
+
+    saveGame();
+
+  }
+);
+
+
+/* =========================================================
+   BOOK / RETURN
 ========================================================= */
 
 function checkBook(){
 
   if(
     state.completed
-  )
+  ){
     return;
+  }
 
 
   if(
-    getProgress()<100
-  )
+    progress()<100
+  ){
     return;
+  }
 
-
-  /*
-     At 100% the player must
-     physically return to the beginning.
-  */
 
   state.returning=true;
 
 
-  const dx=
+  const dx =
     player.x-
     book.x;
 
-  const dy=
+  const dy =
     player.y-
     book.y;
 
 
-  const distance=
+  const distance =
     Math.sqrt(
       dx*dx+
       dy*dy
@@ -3644,15 +3160,14 @@ function checkBook(){
   ){
 
     state.completed=true;
-
     state.returning=false;
 
     saveGame();
 
 
     document.getElementById(
-      "bookOverlay"
-    ).style.display=
+      "completeOverlay"
+    ).style.display =
       "flex";
 
   }
@@ -3664,21 +3179,21 @@ function checkBook(){
    HINT
 ========================================================= */
 
-let hintTimer=0;
+let hintCounter=0;
 
 
 function updateHint(){
 
-  const hint=
+  const hint =
     document.getElementById(
       "hint"
     );
 
 
   if(
+    !state.started ||
     state.storyOpen ||
-    state.completed ||
-    !state.started
+    state.completed
   ){
 
     hint.classList.remove(
@@ -3691,10 +3206,10 @@ function updateHint(){
 
 
   if(
-    getProgress()>=100
+    progress()>=100
   ){
 
-    hint.textContent=
+    hint.textContent =
       "THE CITY IS COMPLETE — RETURN TO WHERE YOU BEGAN.";
 
     hint.classList.add(
@@ -3707,54 +3222,47 @@ function updateHint(){
 
 
   let nearest=null;
-
-  let nearestDistance=
-    Infinity;
+  let nearestDistance=Infinity;
 
 
-  for(
-    const obj
-    of objects
-  ){
+  discoveries.forEach(
+    d=>{
 
-    if(
-      discovered.has(
-        obj.id
-      )
-    )
-      continue;
+      if(
+        discovered.has(d.id)
+      ){
+        return;
+      }
 
 
-    const dx=
-      player.x-
-      obj.x;
+      const dx =
+        player.x-d.x;
 
-    const dy=
-      player.y-
-      obj.y;
+      const dy =
+        player.y-d.y;
 
 
-    const distance=
-      Math.sqrt(
-        dx*dx+
-        dy*dy
-      );
+      const distance =
+        Math.sqrt(
+          dx*dx+
+          dy*dy
+        );
 
 
-    if(
-      distance<
-      nearestDistance
-    ){
+      if(
+        distance<
+        nearestDistance
+      ){
 
-      nearestDistance=
-        distance;
+        nearestDistance=
+          distance;
 
-      nearest=
-        obj;
+        nearest=d;
+
+      }
 
     }
-
-  }
+  );
 
 
   if(
@@ -3762,26 +3270,24 @@ function updateHint(){
     nearestDistance<220
   ){
 
-    hint.textContent=
+    hint.textContent =
       "DISCOVERY NEARBY — "+
       nearest.title;
-
 
     hint.classList.add(
       "show"
     );
 
-
-    hintTimer=20;
+    hintCounter=30;
 
   }
   else{
 
-    hintTimer--;
+    hintCounter--;
 
 
     if(
-      hintTimer<=0
+      hintCounter<=0
     ){
 
       hint.classList.remove(
@@ -3801,16 +3307,12 @@ function updateHint(){
 
 function drawVignette(){
 
-  const p=
-    getPressure();
-
-
-  const strength=
+  const strength =
     .25+
-    p*.30;
+    pressure()*.30;
 
 
-  const gradient=
+  const gradient =
     ctx.createRadialGradient(
       W/2,
       H/2,
@@ -3836,7 +3338,7 @@ function drawVignette(){
   );
 
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     gradient;
 
 
@@ -3851,7 +3353,7 @@ function drawVignette(){
 
 
 /* =========================================================
-   DRAW
+   MAIN DRAW
 ========================================================= */
 
 function draw(){
@@ -3876,15 +3378,15 @@ function draw(){
 
   drawNPCs();
 
-  drawEnvironmentalStory();
+  drawEnvironment();
 
-  drawStoryObjects();
+  drawDiscoveryMarkers();
 
   drawBook();
 
   drawCompanion();
 
-  drawBallCharacter();
+  drawPlayer();
 
   drawVignette();
 
@@ -3904,12 +3406,10 @@ document.getElementById(
 
     state.started=true;
 
-
     document.getElementById(
       "startOverlay"
-    ).style.display=
+    ).style.display =
       "none";
-
 
     updateHUD();
 
@@ -3918,11 +3418,11 @@ document.getElementById(
 
 
 /* =========================================================
-   READ BOOK
+   READ 1984
 ========================================================= */
 
 document.getElementById(
-  "readBookButton"
+  "readButton"
 )
 .addEventListener(
   "click",
@@ -3932,6 +3432,24 @@ document.getElementById(
       "https://archive.org/details/dli.ernet.240835",
       "_blank"
     );
+
+  }
+);
+
+
+/* =========================================================
+   LIBRARY
+========================================================= */
+
+document.getElementById(
+  "libraryButton"
+)
+.addEventListener(
+  "click",
+  function(){
+
+    window.location.href =
+      "../index.html";
 
   }
 );
@@ -3948,14 +3466,17 @@ document.getElementById(
   "click",
   function(){
 
-    const yes=
-      confirm(
+    const confirmed =
+      window.confirm(
         "Reset THE WATCHED CITY and start again?"
       );
 
 
-    if(!yes)
+    if(
+      !confirmed
+    ){
       return;
+    }
 
 
     localStorage.removeItem(
@@ -3963,14 +3484,14 @@ document.getElementById(
     );
 
 
-    location.reload();
+    window.location.reload();
 
   }
 );
 
 
 /* =========================================================
-   MAIN LOOP
+   GAME LOOP
 ========================================================= */
 
 function gameLoop(){
@@ -4001,7 +3522,7 @@ function gameLoop(){
 
 
 /* =========================================================
-   INITIALISE
+   START ENGINE
 ========================================================= */
 
 updateHUD();
