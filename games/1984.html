@@ -1,1630 +1,2247 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport"
-      content="width=device-width,
-               initial-scale=1,
-               maximum-scale=1,
-               user-scalable=no">
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0,user-scalable=no">
 
-<title>1984 — The Watched City</title>
+<title>THE WATCHED CITY — 1984</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
-
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-
-    background: #111;
-
-    font-family: Arial, sans-serif;
-
-    touch-action: none;
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#07090c;
+  color:#e8edf2;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
-#game {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    background: #222;
+button{
+  font:inherit;
 }
 
-#world {
-    position: absolute;
-
-    width: 2200px;
-    height: 1600px;
-
-    background:
-        linear-gradient(#292929 2px, transparent 2px),
-        linear-gradient(90deg, #292929 2px, transparent 2px);
-
-    background-size: 80px 80px;
+#game{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  background:#07090c;
 }
 
+/* =========================
+   WORLD
+========================= */
 
-/* ROADS */
-
-.road {
-    position: absolute;
-    background: #383838;
+#world{
+  position:absolute;
+  left:0;
+  top:0;
+  width:4200px;
+  height:3400px;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      #252a30 0%,
+      #171b20 35%,
+      #0c0f13 70%,
+      #07090c 100%
+    );
 }
 
-.horizontal {
-    width: 2200px;
-    height: 160px;
+#world::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(
+      circle at center,
+      transparent 0%,
+      rgba(0,0,0,.15) 45%,
+      rgba(0,0,0,.55) 100%
+    );
 }
 
-.vertical {
-    width: 160px;
-    height: 1600px;
+/* =========================
+   PLAYER
+========================= */
+
+#player{
+  position:absolute;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:
+    0 0 15px rgba(255,255,255,.7),
+    0 0 35px rgba(255,255,255,.2);
+  z-index:20;
 }
 
-
-/* BUILDINGS */
-
-.building {
-    position: absolute;
-
-    background: #444;
-
-    border: 5px solid #555;
-
-    box-shadow:
-        inset 0 0 0 4px #292929;
+#player::before,
+#player::after{
+  content:"";
+  position:absolute;
+  top:31%;
+  width:17%;
+  height:25%;
+  border-radius:50%;
+  background:#07090c;
 }
 
-
-/* PLAYER */
-
-#player {
-    position: absolute;
-
-    width: 42px;
-    height: 42px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    border: 4px solid #111;
-
-    z-index: 50;
-
-    box-shadow:
-        0 0 18px rgba(255,255,255,.5);
+#player::before{
+  left:22%;
 }
 
-
-/* CAMERAS */
-
-.camera {
-    position: absolute;
-
-    width: 65px;
-    height: 65px;
-
-    border-radius: 50%;
-
-    background: #111;
-
-    border: 4px solid #777;
-
-    z-index: 20;
+#player::after{
+  right:22%;
 }
 
-.camera::before {
-    content: "◉";
+/* =========================
+   ENVIRONMENT
+========================= */
 
-    position: absolute;
-
-    left: 14px;
-    top: 10px;
-
-    color: white;
-
-    font-size: 28px;
+.building{
+  position:absolute;
+  background:#11151a;
+  border:2px solid #252b32;
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,.35),
+    0 8px 20px rgba(0,0,0,.35);
 }
 
-.camera::after {
-    content: "";
-
-    position: absolute;
-
-    width: 170px;
-    height: 170px;
-
-    left: -56px;
-    top: -56px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255,255,255,.035);
+.building::after{
+  content:"";
+  position:absolute;
+  inset:12px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(190,195,200,.08) 0 18px,
+      transparent 18px 42px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(190,195,200,.05) 0 18px,
+      transparent 18px 38px
+    );
+  opacity:.7;
 }
 
-
-/* SECRET ROOM */
-
-#room {
-    position: absolute;
-
-    left: 1760px;
-    top: 1120px;
-
-    width: 280px;
-    height: 250px;
-
-    background: #111;
-
-    border: 7px solid #777;
-
-    z-index: 10;
+.street{
+  position:absolute;
+  background:#171b20;
+  border:1px solid #252b30;
 }
 
-#room::before {
-    content: "HIDDEN ROOM";
-
-    position: absolute;
-
-    top: -38px;
-    left: 65px;
-
-    color: #aaa;
-
-    letter-spacing: 3px;
-
-    font-size: 13px;
+.lamp{
+  position:absolute;
+  width:7px;
+  height:120px;
+  background:#272d33;
 }
 
-
-/* BOOK */
-
-#book {
-    position: absolute;
-
-    left: 1860px;
-    top: 1215px;
-
-    width: 65px;
-    height: 55px;
-
-    background: white;
-
-    border: 4px solid #111;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 28px;
-
-    z-index: 30;
-
-    box-shadow:
-        0 0 30px rgba(255,255,255,.6);
+.lamp::before{
+  content:"";
+  position:absolute;
+  top:-8px;
+  left:-9px;
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  background:#ddd;
+  box-shadow:
+    0 0 20px rgba(255,255,255,.45);
 }
 
-
-/* HUD */
-
-#hud {
-    position: fixed;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    z-index: 100;
-
-    padding: 12px;
-
-    pointer-events: none;
+.sign{
+  position:absolute;
+  min-width:170px;
+  padding:10px 14px;
+  border:1px solid #343b43;
+  background:#101419;
+  color:#adb5bd;
+  font-size:15px;
+  letter-spacing:2px;
+  text-align:center;
 }
 
-#message {
-    max-width: 520px;
-
-    margin: auto;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    background:
-        rgba(0,0,0,.88);
-
-    color: white;
-
-    text-align: center;
-
-    font-size: 14px;
+.screen{
+  position:absolute;
+  width:190px;
+  height:120px;
+  border:3px solid #353c43;
+  background:#090b0e;
+  color:#ddd;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:15px;
+  letter-spacing:2px;
+  box-shadow:0 0 30px rgba(255,255,255,.04);
 }
 
-#status {
-    margin-top: 7px;
-
-    text-align: center;
-
-    color: #aaa;
-
-    font-size: 12px;
+.camera{
+  position:absolute;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:3px solid #777;
+  background:#161a1f;
+  box-shadow:
+    0 0 12px rgba(255,255,255,.08);
 }
 
-
-/* CONTROLS */
-
-#controls {
-    position: fixed;
-
-    left: 50%;
-    bottom:
-        calc(
-            18px +
-            env(safe-area-inset-bottom)
-        );
-
-    transform: translateX(-50%);
-
-    z-index: 200;
-
-    display: grid;
-
-    grid-template-columns:
-        68px 68px 68px;
-
-    grid-template-rows:
-        68px 68px;
-
-    gap: 8px;
-
-    touch-action: none;
+.camera::after{
+  content:"";
+  position:absolute;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  background:#ddd;
 }
 
-.control {
-    width: 68px;
-    height: 68px;
-
-    border: 2px solid #777;
-
-    border-radius: 14px;
-
-    background:
-        rgba(10,10,10,.93);
-
-    color: white;
-
-    font-size: 25px;
-
-    touch-action: none;
-
-    user-select: none;
-
-    -webkit-user-select: none;
+.patrol{
+  position:absolute;
+  width:18px;
+  height:36px;
+  border-radius:9px 9px 5px 5px;
+  background:#3a4148;
+  opacity:.9;
 }
 
-.control.pressed {
-    background: #555;
-
-    transform: scale(.95);
+.patrol::before{
+  content:"";
+  position:absolute;
+  left:2px;
+  top:-15px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#4a5158;
 }
 
-.up {
-    grid-column: 2;
-    grid-row: 1;
+.barrier{
+  position:absolute;
+  width:190px;
+  height:12px;
+  background:#4a4f54;
+  border:2px solid #676d72;
 }
 
-.left {
-    grid-column: 1;
-    grid-row: 2;
+.tree{
+  position:absolute;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#263128;
+  box-shadow:0 30px 0 -10px #202720;
 }
 
-.down {
-    grid-column: 2;
-    grid-row: 2;
+/* =========================
+   CAMERA WORLD EFFECT
+========================= */
+
+.camera-beam{
+  position:absolute;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.025) 35%,
+      transparent 70%
+    );
+  pointer-events:none;
+  opacity:.45;
 }
 
-.right {
-    grid-column: 3;
-    grid-row: 2;
+/* =========================
+   NPC / COMPANION
+========================= */
+
+.npc{
+  position:absolute;
+  width:22px;
+  height:40px;
+  border-radius:10px 10px 5px 5px;
+  background:#565d64;
+  z-index:10;
+  opacity:.8;
 }
 
-
-/* READ BUTTON */
-
-#readButton {
-    position: fixed;
-
-    left: 50%;
-
-    bottom:
-        calc(
-            125px +
-            env(safe-area-inset-bottom)
-        );
-
-    transform: translateX(-50%);
-
-    z-index: 300;
-
-    display: none;
-
-    padding: 15px 25px;
-
-    min-width: 220px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background: white;
-
-    color: black;
-
-    font-size: 16px;
-
-    font-weight: bold;
+.npc::before{
+  content:"";
+  position:absolute;
+  width:16px;
+  height:16px;
+  left:3px;
+  top:-12px;
+  border-radius:50%;
+  background:#626970;
 }
 
-#readButton.show {
-    display: block;
+/* =========================
+   STORY MARKERS
+========================= */
+
+.marker{
+  position:absolute;
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.75);
+  background:rgba(255,255,255,.08);
+  box-shadow:
+    0 0 18px rgba(255,255,255,.18);
+  z-index:8;
 }
 
-
-/* INTRO / FOUND */
-
-.overlay {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 500;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        rgba(0,0,0,.96);
-
-    color: white;
-
-    padding: 25px;
-
-    text-align: center;
+.marker::before{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
 }
 
-.panel {
-    width: min(500px, 100%);
+.marker.done{
+  opacity:.22;
+  border-color:#697078;
+  box-shadow:none;
 }
 
-.panel h1 {
-    font-size: 38px;
-
-    letter-spacing: 5px;
-
-    margin-bottom: 20px;
+.marker-label{
+  position:absolute;
+  top:62px;
+  left:50%;
+  transform:translateX(-50%);
+  width:180px;
+  text-align:center;
+  color:#aeb5bc;
+  font-size:12px;
+  letter-spacing:1px;
 }
 
-.panel p {
-    color: #aaa;
+/* =========================
+   CAMERA / HUD
+========================= */
 
-    line-height: 1.6;
+#cameraView{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:100vw;
+  height:100vh;
+  transform:translate(-50%,-50%);
+  overflow:hidden;
 }
 
-.button {
-    display: inline-block;
-
-    margin-top: 20px;
-
-    padding: 14px 25px;
-
-    min-height: 50px;
-
-    border: none;
-
-    border-radius: 9px;
-
-    background: white;
-
-    color: black;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    text-decoration: none;
+#worldLayer{
+  position:absolute;
+  left:0;
+  top:0;
 }
 
-.secondary {
-    background: #333;
-
-    color: white;
-
-    border: 1px solid #777;
+#hud{
+  position:fixed;
+  left:0;
+  top:0;
+  width:100%;
+  padding:15px;
+  z-index:40;
+  pointer-events:none;
 }
 
-.hidden {
-    display: none !important;
+#titleHud{
+  font-size:13px;
+  letter-spacing:3px;
+  color:#c3c9cf;
+  text-transform:uppercase;
 }
 
-
-/* CAUGHT */
-
-#caught {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 450;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        rgba(70,0,0,.96);
-
-    color: white;
-
-    text-align: center;
+#progressHud{
+  margin-top:8px;
+  width:min(360px,55vw);
+  height:5px;
+  background:#20252a;
+  border-radius:5px;
+  overflow:hidden;
 }
 
-#caught h2 {
-    font-size: 40px;
-
-    letter-spacing: 6px;
+#progressBar{
+  height:100%;
+  width:0%;
+  background:#eee;
+  transition:width .25s ease;
 }
 
-
-/* SMALL SCREEN */
-
-@media(max-height:600px) {
-
-    #controls {
-        bottom: 8px;
-
-        grid-template-columns:
-            58px 58px 58px;
-
-        grid-template-rows:
-            58px 58px;
-    }
-
-    .control {
-        width: 58px;
-        height: 58px;
-    }
-
-    #readButton {
-        bottom: 80px;
-    }
+#progressText{
+  margin-top:7px;
+  font-size:12px;
+  color:#858d95;
 }
 
+/* =========================
+   MESSAGE
+========================= */
+
+#message{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(620px,88vw);
+  max-height:78vh;
+  overflow:auto;
+  padding:28px 24px;
+  background:rgba(7,9,12,.96);
+  border:1px solid #3b4249;
+  box-shadow:
+    0 20px 80px rgba(0,0,0,.7);
+  z-index:100;
+  text-align:center;
+  display:none;
+}
+
+#message.show{
+  display:block;
+}
+
+#message h2{
+  margin:0 0 16px;
+  font-size:25px;
+  letter-spacing:2px;
+}
+
+#message p{
+  margin:10px 0;
+  color:#bfc6cc;
+  line-height:1.65;
+  font-size:15px;
+}
+
+#continueButton{
+  margin-top:20px;
+  padding:12px 25px;
+  border:1px solid #777;
+  background:#eee;
+  color:#090b0e;
+  cursor:pointer;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+/* =========================
+   INTRO / COMPLETE
+========================= */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:
+    radial-gradient(
+      circle at center,
+      #1d2228 0%,
+      #0c1014 55%,
+      #07090c 100%
+    );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:25px;
+  overflow:auto;
+}
+
+.panel{
+  width:min(700px,94vw);
+  text-align:center;
+}
+
+.logo-character{
+  position:relative;
+  width:110px;
+  height:110px;
+  margin:0 auto 25px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:
+    0 0 22px rgba(255,255,255,.7),
+    0 0 60px rgba(255,255,255,.28),
+    0 0 110px rgba(255,255,255,.1);
+  animation:float 4s ease-in-out infinite;
+}
+
+.logo-character::before,
+.logo-character::after{
+  content:"";
+  position:absolute;
+  top:31%;
+  width:17%;
+  height:25%;
+  border-radius:50%;
+  background:#07090c;
+}
+
+.logo-character::before{
+  left:22%;
+}
+
+.logo-character::after{
+  right:22%;
+}
+
+@keyframes float{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-8px);
+  }
+}
+
+.panel h1{
+  margin:0;
+  font-size:clamp(28px,7vw,55px);
+  letter-spacing:4px;
+  line-height:1.05;
+}
+
+.panel h2{
+  margin:14px 0 25px;
+  font-size:18px;
+  color:#aeb5bc;
+  font-weight:normal;
+}
+
+.panel p{
+  color:#bfc6cc;
+  line-height:1.65;
+  font-size:15px;
+}
+
+.mainButton{
+  margin-top:20px;
+  padding:14px 28px;
+  border:1px solid #777;
+  background:#fff;
+  color:#07090c;
+  font-weight:bold;
+  cursor:pointer;
+  letter-spacing:1px;
+}
+
+.secondaryButton{
+  margin-top:12px;
+  padding:11px 24px;
+  border:1px solid #444;
+  background:#11151a;
+  color:#d7dce0;
+  cursor:pointer;
+}
+
+#completeScreen{
+  display:none;
+}
+
+/* =========================
+   JOYSTICK
+========================= */
+
+#joystick{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  top:auto;
+  transform:translateX(-50%);
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  border:2px solid rgba(220,230,240,.65);
+  background:rgba(10,13,17,.55);
+  z-index:30;
+  touch-action:none;
+}
+
+#stick{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:65px;
+  height:65px;
+  margin-left:-32.5px;
+  margin-top:-32.5px;
+  border-radius:50%;
+  background:rgba(220,225,230,.82);
+  border:2px solid #fff;
+  box-shadow:
+    0 4px 15px rgba(0,0,0,.45);
+  pointer-events:none;
+}
+
+/* =========================
+   BOOK
+========================= */
+
+#book{
+  position:absolute;
+  width:74px;
+  height:92px;
+  background:#e7e7e7;
+  border:3px solid #fff;
+  box-shadow:
+    0 0 25px rgba(255,255,255,.3);
+  z-index:9;
+}
+
+#book::before{
+  content:"1984";
+  position:absolute;
+  left:8px;
+  top:28px;
+  color:#111;
+  font-weight:bold;
+  font-size:15px;
+  letter-spacing:1px;
+}
+
+/* =========================
+   FINAL STATE
+========================= */
+
+.final-world #world{
+  filter:brightness(.78);
+}
+
+.final-world .camera{
+  box-shadow:
+    0 0 25px rgba(255,255,255,.18);
+}
+
+.final-world .screen{
+  border-color:#555;
+}
+
+.final-world .patrol{
+  opacity:1;
+}
+
+/* =========================
+   SMALL SCREENS
+========================= */
+
+@media(max-width:600px){
+
+  #player{
+    width:52px;
+    height:52px;
+  }
+
+  #joystick{
+    width:140px;
+    height:140px;
+    bottom:18px;
+  }
+
+  #stick{
+    width:60px;
+    height:60px;
+    margin-left:-30px;
+    margin-top:-30px;
+  }
+
+  #message{
+    padding:22px 18px;
+  }
+
+  .panel{
+    padding-top:10px;
+    padding-bottom:20px;
+  }
+
+  .logo-character{
+    width:90px;
+    height:90px;
+  }
+}
 </style>
-
 </head>
-
 
 <body>
 
-
 <div id="game">
 
-    <div id="world">
+  <div id="cameraView">
+    <div id="worldLayer">
 
-        <!-- ROADS -->
+      <div id="world">
 
-        <div
-            class="road horizontal"
-            style="top:350px;">
-        </div>
+        <!-- STREETS -->
 
-        <div
-            class="road horizontal"
-            style="top:800px;">
-        </div>
+        <div class="street"
+             style="left:0;top:1450px;width:4200px;height:330px;"></div>
 
-        <div
-            class="road vertical"
-            style="left:500px;">
-        </div>
+        <div class="street"
+             style="left:1900px;top:0;width:330px;height:3400px;"></div>
 
-        <div
-            class="road vertical"
-            style="left:1200px;">
-        </div>
+        <div class="street"
+             style="left:500px;top:600px;width:3100px;height:230px;"></div>
 
+        <div class="street"
+             style="left:900px;top:2450px;width:2600px;height:220px;"></div>
 
         <!-- BUILDINGS -->
 
-        <div
-            class="building"
-            style="
-                left:70px;
-                top:60px;
-                width:350px;
-                height:220px;">
+        <div class="building"
+             style="left:180px;top:150px;width:800px;height:350px;"></div>
+
+        <div class="building"
+             style="left:1150px;top:100px;width:620px;height:450px;"></div>
+
+        <div class="building"
+             style="left:2450px;top:120px;width:900px;height:440px;"></div>
+
+        <div class="building"
+             style="left:3450px;top:750px;width:550px;height:650px;"></div>
+
+        <div class="building"
+             style="left:150px;top:850px;width:650px;height:450px;"></div>
+
+        <div class="building"
+             style="left:850px;top:900px;width:760px;height:400px;"></div>
+
+        <div class="building"
+             style="left:2500px;top:800px;width:700px;height:480px;"></div>
+
+        <div class="building"
+             style="left:3250px;top:1650px;width:750px;height:500px;"></div>
+
+        <div class="building"
+             style="left:200px;top:1950px;width:620px;height:430px;"></div>
+
+        <div class="building"
+             style="left:900px;top:2050px;width:700px;height:320px;"></div>
+
+        <div class="building"
+             style="left:2500px;top:2100px;width:650px;height:450px;"></div>
+
+        <div class="building"
+             style="left:3250px;top:2450px;width:700px;height:500px;"></div>
+
+        <!-- MINISTRIES -->
+
+        <div class="building"
+             style="left:1000px;top:1250px;width:680px;height:520px;border-color:#464d54;">
+
+          <div class="sign"
+               style="left:210px;top:210px;">
+            MINISTRY OF TRUTH
+          </div>
+
         </div>
 
-        <div
-            class="building"
-            style="
-                left:680px;
-                top:60px;
-                width:400px;
-                height:220px;">
+        <div class="building"
+             style="left:2500px;top:1300px;width:620px;height:520px;border-color:#464d54;">
+
+          <div class="sign"
+               style="left:180px;top:210px;">
+            MINISTRY OF LOVE
+          </div>
+
         </div>
 
-        <div
-            class="building"
-            style="
-                left:1450px;
-                top:60px;
-                width:450px;
-                height:230px;">
+        <!-- TELESCREENS -->
+
+        <div class="screen"
+             style="left:450px;top:130px;">
+          BIG BROTHER<br>
+          IS WATCHING
         </div>
 
-        <div
-            class="building"
-            style="
-                left:80px;
-                top:1050px;
-                width:350px;
-                height:250px;">
+        <div class="screen"
+             style="left:2850px;top:210px;">
+          WAR IS PEACE
         </div>
 
-        <div
-            class="building"
-            style="
-                left:650px;
-                top:1050px;
-                width:380px;
-                height:250px;">
+        <div class="screen"
+             style="left:120px;top:1700px;">
+          TWO MINUTES HATE
         </div>
 
+        <div class="screen"
+             style="left:3000px;top:1740px;">
+          BIG BROTHER<br>
+          IS WATCHING
+        </div>
+
+        <div class="screen"
+             style="left:700px;top:2750px;">
+          FREEDOM IS SLAVERY
+        </div>
+
+        <!-- SIGNS -->
+
+        <div class="sign"
+             style="left:1700px;top:700px;">
+          VICTORY MANSION
+        </div>
+
+        <div class="sign"
+             style="left:2150px;top:1100px;">
+          PROLE DISTRICT
+        </div>
+
+        <div class="sign"
+             style="left:1650px;top:2800px;">
+          NEWSPEAK ONLY
+        </div>
 
         <!-- CAMERAS -->
 
-        <div
-            class="camera"
-            style="
-                left:420px;
-                top:290px;">
+        <div class="camera" style="left:900px;top:540px;"></div>
+        <div class="camera" style="left:1800px;top:500px;"></div>
+        <div class="camera" style="left:2250px;top:850px;"></div>
+        <div class="camera" style="left:3100px;top:600px;"></div>
+        <div class="camera" style="left:900px;top:1800px;"></div>
+        <div class="camera" style="left:1900px;top:1750px;"></div>
+        <div class="camera" style="left:3000px;top:1900px;"></div>
+        <div class="camera" style="left:2200px;top:2500px;"></div>
+        <div class="camera" style="left:3200px;top:2750px;"></div>
+
+        <!-- CAMERA AREAS -->
+
+        <div class="camera-beam" style="left:790px;top:430px;"></div>
+        <div class="camera-beam" style="left:1690px;top:390px;"></div>
+        <div class="camera-beam" style="left:2140px;top:740px;"></div>
+        <div class="camera-beam" style="left:2990px;top:490px;"></div>
+        <div class="camera-beam" style="left:790px;top:1690px;"></div>
+        <div class="camera-beam" style="left:1790px;top:1640px;"></div>
+        <div class="camera-beam" style="left:2890px;top:1790px;"></div>
+
+        <!-- BARRIERS -->
+
+        <div class="barrier"
+             style="left:1710px;top:1380px;"></div>
+
+        <div class="barrier"
+             style="left:2200px;top:1460px;"></div>
+
+        <div class="barrier"
+             style="left:1750px;top:2350px;"></div>
+
+        <div class="barrier"
+             style="left:3120px;top:2350px;"></div>
+
+        <!-- LAMPS -->
+
+        <div class="lamp" style="left:350px;top:1350px;"></div>
+        <div class="lamp" style="left:750px;top:1350px;"></div>
+        <div class="lamp" style="left:1500px;top:1350px;"></div>
+        <div class="lamp" style="left:2350px;top:1350px;"></div>
+        <div class="lamp" style="left:2900px;top:1350px;"></div>
+        <div class="lamp" style="left:3650px;top:1350px;"></div>
+
+        <div class="lamp" style="left:1850px;top:400px;"></div>
+        <div class="lamp" style="left:1850px;top:900px;"></div>
+        <div class="lamp" style="left:1850px;top:1900px;"></div>
+        <div class="lamp" style="left:1850px;top:2700px;"></div>
+
+        <!-- TREES / CONTROLLED GREEN SPACE -->
+
+        <div class="tree" style="left:470px;top:2550px;"></div>
+        <div class="tree" style="left:540px;top:2640px;"></div>
+        <div class="tree" style="left:620px;top:2570px;"></div>
+
+        <div class="tree" style="left:3450px;top:400px;"></div>
+        <div class="tree" style="left:3520px;top:470px;"></div>
+
+        <!-- NPCs -->
+
+        <div class="npc" style="left:450px;top:1450px;"></div>
+        <div class="npc" style="left:700px;top:1500px;"></div>
+        <div class="npc" style="left:1250px;top:1430px;"></div>
+        <div class="npc" style="left:1450px;top:1520px;"></div>
+        <div class="npc" style="left:2700px;top:1510px;"></div>
+        <div class="npc" style="left:2900px;top:1440px;"></div>
+        <div class="npc" style="left:3350px;top:1500px;"></div>
+        <div class="npc" style="left:3700px;top:1580px;"></div>
+
+        <!-- BOOK AT START -->
+
+        <div id="book"
+             style="left:204px;top:1610px;"></div>
+
+        <!-- STORY MARKERS -->
+
+        <div class="marker"
+             data-id="0"
+             style="left:430px;top:1580px;">
+          <div class="marker-label">
+            THE CITY
+          </div>
         </div>
 
-        <div
-            class="camera"
-            style="
-                left:1050px;
-                top:450px;">
+        <div class="marker"
+             data-id="1"
+             style="left:600px;top:1050px;">
+          <div class="marker-label">
+            BIG BROTHER
+          </div>
         </div>
 
-        <div
-            class="camera"
-            style="
-                left:1450px;
-                top:700px;">
+        <div class="marker"
+             data-id="2"
+             style="left:800px;top:650px;">
+          <div class="marker-label">
+            THE TELESCREEN
+          </div>
         </div>
 
-        <div
-            class="camera"
-            style="
-                left:720px;
-                top:820px;">
+        <div class="marker"
+             data-id="3"
+             style="left:240px;top:1750px;">
+          <div class="marker-label">
+            TWO MINUTES HATE
+          </div>
         </div>
 
-        <div
-            class="camera"
-            style="
-                left:1600px;
-                top:920px;">
+        <div class="marker"
+             data-id="4"
+             style="left:850px;top:1500px;">
+          <div class="marker-label">
+            THOUGHTCRIME
+          </div>
         </div>
 
-
-        <!-- HIDDEN ROOM -->
-
-        <div id="room"></div>
-
-
-        <!-- BOOK -->
-
-        <div id="book">
-            📖
+        <div class="marker"
+             data-id="5"
+             style="left:1150px;top:1450px;">
+          <div class="marker-label">
+            MINISTRY OF TRUTH
+          </div>
         </div>
 
+        <div class="marker"
+             data-id="6"
+             style="left:1450px;top:1150px;">
+          <div class="marker-label">
+            MEMORY HOLE
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="7"
+             style="left:1550px;top:900px;">
+          <div class="marker-label">
+            NEWSPEAK
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="8"
+             style="left:1750px;top:650px;">
+          <div class="marker-label">
+            DOUBLETHINK
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="9"
+             style="left:1300px;top:700px;">
+          <div class="marker-label">
+            THE DIARY
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="10"
+             style="left:1000px;top:1900px;">
+          <div class="marker-label">
+            MEMORY
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="11"
+             style="left:2300px;top:650px;">
+          <div class="marker-label">
+            JULIA
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="12"
+             style="left:2650px;top:650px;">
+          <div class="marker-label">
+            THE GOLDEN COUNTRY
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="13"
+             style="left:2800px;top:1000px;">
+          <div class="marker-label">
+            GLASS PAPERWEIGHT
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="14"
+             style="left:3050px;top:1100px;">
+          <div class="marker-label">
+            ROOM ABOVE THE SHOP
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="15"
+             style="left:3300px;top:1200px;">
+          <div class="marker-label">
+            THE PROLES
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="16"
+             style="left:3500px;top:1750px;">
+          <div class="marker-label">
+            THE BROTHERHOOD
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="17"
+             style="left:3600px;top:1950px;">
+          <div class="marker-label">
+            FORBIDDEN KNOWLEDGE
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="18"
+             style="left:2850px;top:2200px;">
+          <div class="marker-label">
+            PERMANENT WAR
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="19"
+             style="left:2500px;top:2600px;">
+          <div class="marker-label">
+            THE TRAP
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="20"
+             style="left:2800px;top:2750px;">
+          <div class="marker-label">
+            THOUGHT POLICE
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="21"
+             style="left:3100px;top:2750px;">
+          <div class="marker-label">
+            MINISTRY OF LOVE
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="22"
+             style="left:3350px;top:2700px;">
+          <div class="marker-label">
+            O'BRIEN
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="23"
+             style="left:3650px;top:2750px;">
+          <div class="marker-label">
+            ROOM 101
+          </div>
+        </div>
+
+        <div class="marker"
+             data-id="24"
+             style="left:3850px;top:2900px;">
+          <div class="marker-label">
+            THE END
+          </div>
+        </div>
 
         <!-- PLAYER -->
 
         <div id="player"></div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+
+  <div id="hud">
+
+    <div id="titleHud">
+      THE WATCHED CITY
     </div>
 
-
-    <!-- HUD -->
-
-    <div id="hud">
-
-        <div id="message">
-            FIND A PLACE WHERE YOU CANNOT BE SEEN.
-        </div>
-
-        <div id="status">
-            The city is watching.
-        </div>
-
+    <div id="progressHud">
+      <div id="progressBar"></div>
     </div>
 
-
-    <!-- MOBILE CONTROLS -->
-
-    <div id="controls">
-
-        <button
-            class="control up"
-            data-direction="up"
-            type="button">
-            ▲
-        </button>
-
-        <button
-            class="control left"
-            data-direction="left"
-            type="button">
-            ◀
-        </button>
-
-        <button
-            class="control down"
-            data-direction="down"
-            type="button">
-            ▼
-        </button>
-
-        <button
-            class="control right"
-            data-direction="right"
-            type="button">
-            ▶
-        </button>
-
+    <div id="progressText">
+      0 / 25 DISCOVERED
     </div>
 
+  </div>
 
-    <!-- READ -->
+  <!-- JOYSTICK -->
 
-    <button
-        id="readButton"
-        type="button">
+  <div id="joystick">
+    <div id="stick"></div>
+  </div>
 
-        📖 READ THE BOOK
+  <!-- MESSAGE -->
 
+  <div id="message">
+
+    <h2 id="messageTitle"></h2>
+
+    <p id="messageText"></p>
+
+    <button id="continueButton">
+      CONTINUE
     </button>
 
-</div>
+  </div>
 
+  <!-- INTRO -->
 
-<!-- INTRO -->
-
-<div
-    id="intro"
-    class="overlay">
+  <div id="introScreen" class="overlay">
 
     <div class="panel">
 
-        <h1>
-            1984
-        </h1>
+      <div class="logo-character"></div>
 
-        <p>
-            George Orwell
-        </p>
+      <h1>
+        THE WATCHED CITY
+      </h1>
 
-        <p>
-            The city is watching.
-            Find a place where you
-            cannot be seen.
-        </p>
+      <h2>
+        1984 — George Orwell
+      </h2>
 
-        <p>
-            <strong>
-                Avoid the cameras.
-            </strong>
-        </p>
+      <p>
+        You are about to enter a world you may know nothing about.
+      </p>
 
-        <button
-            id="start"
-            class="button"
-            type="button">
+      <p>
+        You will not be given a traditional summary.
+        You will discover the story by exploring it.
+      </p>
 
-            ENTER THE CITY
+      <p>
+        Walk through the city.
+        Find its institutions.
+        Meet its people.
+        Discover its secrets.
+        Experience its conflict.
+      </p>
 
-        </button>
+      <p>
+        <b>
+          By the time you finish,
+          you should understand the whole story.
+        </b>
+      </p>
+
+      <p>
+        Then the book will be unlocked.
+      </p>
+
+      <button
+        id="startButton"
+        class="mainButton">
+        ENTER THE CITY
+      </button>
 
     </div>
 
-</div>
+  </div>
 
+  <!-- COMPLETE -->
 
-<!-- FOUND -->
-
-<div
-    id="found"
-    class="overlay hidden">
+  <div id="completeScreen" class="overlay">
 
     <div class="panel">
 
-        <div style="font-size:60px;">
-            📖
-        </div>
+      <div class="logo-character"></div>
 
-        <h1>
-            BOOK FOUND
-        </h1>
+      <h1>
+        THE WATCHED CITY
+      </h1>
 
-        <p>
-            You discovered:
-        </p>
+      <h2>
+        EXPERIENCE COMPLETE
+      </h2>
 
-        <h2>
-            1984
-        </h2>
+      <p>
+        You have explored the world of
+        <b>1984</b>.
+      </p>
 
-        <p>
-            George Orwell
-        </p>
+      <p>
+        You have encountered its surveillance,
+        propaganda, controlled history,
+        language, memory, love, rebellion,
+        betrayal, interrogation and final breaking.
+      </p>
 
-        <a
-            class="button"
-            href="https://archive.org/details/dli.ernet.240835"
-            target="_blank"
-            rel="noopener noreferrer">
+      <p>
+        You now have the map of the story in your mind.
+      </p>
 
-            READ 1984
+      <p>
+        <b>
+          You understand the book.
+        </b>
+      </p>
 
-        </a>
+      <p>
+        Now you can discover it again through
+        Orwell's actual writing.
+      </p>
 
-        <br>
+      <button
+        id="readBookButton"
+        class="mainButton">
+        🔓 READ 1984
+      </button>
 
-        <a
-            class="button secondary"
-            href="../index.html">
+      <br>
 
-            BOOK LIBRARY
-
-        </a>
-
-    </div>
-
-</div>
-
-
-<!-- CAUGHT -->
-
-<div id="caught">
-
-    <div class="panel">
-
-        <h2>
-            YOU WERE SEEN
-        </h2>
-
-        <p>
-            The cameras found you.
-        </p>
-
-        <button
-            id="retry"
-            class="button"
-            type="button">
-
-            TRY AGAIN
-
-        </button>
-
-        <br>
-
-        <a
-            class="button secondary"
-            href="../index.html">
-
-            BOOK LIBRARY
-
-        </a>
+      <button
+        class="secondaryButton"
+        onclick="location.href='../index.html'">
+        BACK TO LIBRARY
+      </button>
 
     </div>
 
-</div>
+  </div>
 
+</div>
 
 <script>
-
 /* =========================================================
-   GAME STATE
+   CICAN BOOK QUEST
+   THE WATCHED CITY — 1984
+
+   Working gameplay architecture:
+   - direct touch joystick
+   - no pointer events
+   - no building collision
+   - round two-eyed player
+   - 25 discoveries
+   - progressive world pressure
+   - return to starting point
+   - localStorage save
 ========================================================= */
 
-let x = 250;
+const world = document.getElementById("world");
+const player = document.getElementById("player");
 
-let y = 650;
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
 
-const SPEED = 5;
+const introScreen = document.getElementById("introScreen");
+const completeScreen = document.getElementById("completeScreen");
+
+const message = document.getElementById("message");
+const messageTitle = document.getElementById("messageTitle");
+const messageText = document.getElementById("messageText");
+const continueButton = document.getElementById("continueButton");
+
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+
+const startButton = document.getElementById("startButton");
+const readBookButton = document.getElementById("readBookButton");
+
+const WORLD_WIDTH = 4200;
+const WORLD_HEIGHT = 3400;
+
+const playerSize = 58;
+
+let playerX = 240;
+let playerY = 1610;
+
+let velocityX = 0;
+let velocityY = 0;
+
+let joystickActive = false;
+let joystickX = 0;
+let joystickY = 0;
 
 let playing = false;
+let returning = false;
+let completed = false;
 
-let discovered = false;
+let cameraX = 0;
+let cameraY = 0;
 
+let discovered = [];
 
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const player =
-    document.getElementById(
-        "player"
-    );
-
-const world =
-    document.getElementById(
-        "world"
-    );
-
-const room =
-    document.getElementById(
-        "room"
-    );
-
-const message =
-    document.getElementById(
-        "message"
-    );
-
-const status =
-    document.getElementById(
-        "status"
-    );
-
-const intro =
-    document.getElementById(
-        "intro"
-    );
-
-const found =
-    document.getElementById(
-        "found"
-    );
-
-const caught =
-    document.getElementById(
-        "caught"
-    );
-
-const readButton =
-    document.getElementById(
-        "readButton"
-    );
-
+const saveKey = "cican_book_quest_1984_final_v2";
 
 /* =========================================================
-   MOVEMENT
+   DISCOVERY DATA
 ========================================================= */
 
-const movement = {
+const discoveries = [
 
-    up: false,
-    down: false,
-    left: false,
-    right: false
+  {
+    title:"THE CITY",
+    text:
+      "Oceania is a controlled society where surveillance and obedience shape everyday life. The city itself is part of the system."
+  },
 
-};
+  {
+    title:"BIG BROTHER",
+    text:
+      "Big Brother is the face of the Party. Whether he is a real individual or a constructed symbol matters less than the power represented by his image."
+  },
 
+  {
+    title:"THE TELESCREEN",
+    text:
+      "Telescreens broadcast Party information while also allowing citizens to be watched. Privacy has almost disappeared."
+  },
+
+  {
+    title:"TWO MINUTES HATE",
+    text:
+      "Citizens are directed into collective hatred against enemies of the Party. Emotion itself becomes something the state can organise."
+  },
+
+  {
+    title:"THOUGHTCRIME",
+    text:
+      "The Party does not only control actions. It attempts to control thought. A private idea can become a crime."
+  },
+
+  {
+    title:"MINISTRY OF TRUTH",
+    text:
+      "Winston works at the Ministry of Truth, altering historical records so the past continually agrees with the Party's present claims."
+  },
+
+  {
+    title:"MEMORY HOLE",
+    text:
+      "Documents that no longer fit the official story are destroyed. The discarded records disappear from ordinary history."
+  },
+
+  {
+    title:"NEWSPEAK",
+    text:
+      "Newspeak reduces language in order to reduce the range of thought that can be expressed. Controlling words becomes a way of controlling ideas."
+  },
+
+  {
+    title:"DOUBLETHINK",
+    text:
+      "Doublethink requires people to accept contradictory ideas and suppress awareness of the contradiction."
+  },
+
+  {
+    title:"THE DIARY",
+    text:
+      "Winston begins writing privately. The diary becomes an act of resistance because it preserves a thought outside the Party's control."
+  },
+
+  {
+    title:"MEMORY",
+    text:
+      "Winston's uncertain memories reveal the struggle between personal experience and the Party's manufactured version of reality."
+  },
+
+  {
+    title:"JULIA",
+    text:
+      "Julia becomes Winston's lover and fellow rebel. Their relationship creates a private space beyond Party control."
+  },
+
+  {
+    title:"THE GOLDEN COUNTRY",
+    text:
+      "The Golden Country becomes a powerful imagined space of freedom, nature and escape from the controlled city."
+  },
+
+  {
+    title:"THE GLASS PAPERWEIGHT",
+    text:
+      "The glass paperweight represents Winston's attempt to preserve a small private world and connect with a past outside Party control."
+  },
+
+  {
+    title:"THE ROOM ABOVE THE SHOP",
+    text:
+      "The room appears to offer Winston and Julia a private refuge. It becomes part of the illusion that they have escaped surveillance."
+  },
+
+  {
+    title:"THE PROLES",
+    text:
+      "The proles form the majority of the population. They are less intensely controlled, yet their political power remains unrealised."
+  },
+
+  {
+    title:"THE BROTHERHOOD",
+    text:
+      "Winston believes the Brotherhood represents organised resistance against the Party. Its reality becomes increasingly uncertain."
+  },
+
+  {
+    title:"FORBIDDEN KNOWLEDGE",
+    text:
+      "Winston wants to know what the Party has erased: what the world was like before, what is true, and whether another reality is possible."
+  },
+
+  {
+    title:"PERMANENT WAR",
+    text:
+      "War is presented as permanent. The conflict helps justify scarcity, discipline and the continuing power of the Party."
+  },
+
+  {
+    title:"THE TRAP",
+    text:
+      "The private room that seemed safe is revealed as part of the trap. Winston and Julia's rebellion has been observed."
+  },
+
+  {
+    title:"THOUGHT POLICE",
+    text:
+      "The Thought Police enforce the Party's control over thought and behaviour. Resistance cannot simply hide behind private walls."
+  },
+
+  {
+    title:"MINISTRY OF LOVE",
+    text:
+      "The Ministry of Love is associated with imprisonment, interrogation and punishment. Its name deliberately contradicts its function."
+  },
+
+  {
+    title:"O'BRIEN",
+    text:
+      "O'Brien appears to be a possible ally before becoming one of the central forces of Winston's destruction."
+  },
+
+  {
+    title:"ROOM 101",
+    text:
+      "Room 101 represents the final personal terror used to break Winston. The Party seeks not merely obedience but surrender at the deepest emotional level."
+  },
+
+  {
+    title:"THE END",
+    text:
+      "After torture and psychological destruction, Winston's resistance has been broken. The ending shows the terrifying completeness of the Party's control."
+  }
+
+];
 
 /* =========================================================
-   RESET
+   INITIALISE
 ========================================================= */
 
-function resetGame() {
+function loadGame(){
 
-    x = 250;
+  try{
 
-    y = 650;
+    const saved =
+      JSON.parse(
+        localStorage.getItem(saveKey) || "null"
+      );
 
-    discovered = false;
+    if(saved){
 
-    playing = false;
+      discovered =
+        Array.isArray(saved.discovered)
+          ? saved.discovered
+          : [];
 
-    clearMovement();
+      completed =
+        saved.completed === true;
 
-    found.classList.add(
-        "hidden"
-    );
+      returning =
+        saved.returning === true;
 
-    caught.style.display =
-        "none";
+    }
 
-    readButton.classList.remove(
-        "show"
-    );
+  }catch(error){
 
-    message.textContent =
-        "FIND A PLACE WHERE YOU CANNOT BE SEEN.";
+    discovered = [];
+    completed = false;
+    returning = false;
 
-    status.textContent =
-        "The city is watching.";
+  }
 
-    updatePlayer();
+  updateProgress();
 
-    updateCamera();
+  discoveries.forEach((_,index)=>{
+
+    const marker =
+      document.querySelector(
+        '.marker[data-id="' + index + '"]'
+      );
+
+    if(
+      marker &&
+      discovered.includes(index)
+    ){
+
+      marker.classList.add("done");
+
+    }
+
+  });
 
 }
 
+/* =========================================================
+   SAVE
+========================================================= */
+
+function saveGame(){
+
+  try{
+
+    localStorage.setItem(
+      saveKey,
+      JSON.stringify({
+        discovered:discovered,
+        completed:completed,
+        returning:returning
+      })
+    );
+
+  }catch(error){}
+
+}
 
 /* =========================================================
    START
 ========================================================= */
 
-document
-    .getElementById("start")
-    .addEventListener(
-        "click",
-        function() {
+startButton.addEventListener("click",function(){
 
-            intro.classList.add(
-                "hidden"
-            );
+  introScreen.style.display="none";
 
-            playing = true;
+  playing=true;
 
-        }
-    );
+  playerX=240;
+  playerY=1610;
 
+  if(completed){
 
-/* =========================================================
-   PLAYER
-========================================================= */
+    returning=true;
 
-function updatePlayer() {
+  }
 
-    player.style.left =
-        x + "px";
+  saveGame();
 
-    player.style.top =
-        y + "px";
+  updateCamera();
 
-}
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-function updateCamera() {
-
-    const screenX =
-        window.innerWidth / 2;
-
-    const screenY =
-        window.innerHeight / 2;
-
-
-    let cameraX =
-        screenX -
-        x -
-        21;
-
-    let cameraY =
-        screenY -
-        y -
-        21;
-
-
-    const minX =
-        window.innerWidth -
-        2200;
-
-    const minY =
-        window.innerHeight -
-        1600;
-
-
-    cameraX =
-        Math.min(
-            0,
-            Math.max(
-                minX,
-                cameraX
-            )
-        );
-
-
-    cameraY =
-        Math.min(
-            0,
-            Math.max(
-                minY,
-                cameraY
-            )
-        );
-
-
-    world.style.transform =
-        `translate(
-            ${cameraX}px,
-            ${cameraY}px
-        )`;
-
-}
-
-
-/* =========================================================
-   MOVE
-========================================================= */
-
-function movePlayer() {
-
-    if (!playing) {
-        return;
-    }
-
-
-    let dx = 0;
-
-    let dy = 0;
-
-
-    if (movement.up)
-        dy -= SPEED;
-
-    if (movement.down)
-        dy += SPEED;
-
-    if (movement.left)
-        dx -= SPEED;
-
-    if (movement.right)
-        dx += SPEED;
-
-
-    /*
-     * Normalize diagonal movement.
-     */
-
-    if (
-        dx !== 0 &&
-        dy !== 0
-    ) {
-
-        const amount =
-            SPEED /
-            Math.sqrt(2);
-
-        dx =
-            dx > 0
-                ? amount
-                : -amount;
-
-        dy =
-            dy > 0
-                ? amount
-                : -amount;
-
-    }
-
-
-    x += dx;
-
-    y += dy;
-
-
-    /*
-     * Keep player inside world.
-     */
-
-    x =
-        Math.max(
-            0,
-            Math.min(
-                2150,
-                x
-            )
-        );
-
-    y =
-        Math.max(
-            0,
-            Math.min(
-                1550,
-                y
-            )
-        );
-
-
-    updatePlayer();
-
-    updateCamera();
-
-    checkCameras();
-
-    checkRoom();
-
-}
-
-
-/* =========================================================
-   CAMERA DETECTION
-========================================================= */
-
-function checkCameras() {
-
-    const cameras =
-        document.querySelectorAll(
-            ".camera"
-        );
-
-
-    cameras.forEach(
-        camera => {
-
-            const cx =
-                parseInt(
-                    camera.style.left
-                );
-
-            const cy =
-                parseInt(
-                    camera.style.top
-                );
-
-
-            const cameraCenterX =
-                cx + 32;
-
-            const cameraCenterY =
-                cy + 32;
-
-
-            const playerCenterX =
-                x + 21;
-
-            const playerCenterY =
-                y + 21;
-
-
-            const dx =
-                playerCenterX -
-                cameraCenterX;
-
-            const dy =
-                playerCenterY -
-                cameraCenterY;
-
-
-            const distance =
-                Math.sqrt(
-                    dx * dx +
-                    dy * dy
-                );
-
-
-            if (
-                distance < 115 &&
-                playing
-            ) {
-
-                playing = false;
-
-                clearMovement();
-
-                caught.style.display =
-                    "flex";
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   ROOM DETECTION
-========================================================= */
-
-function checkRoom() {
-
-    const inside =
-
-        x + 21 > 1780 &&
-        x + 21 < 2020 &&
-        y + 21 > 1140 &&
-        y + 21 < 1340;
-
-
-    if (
-        inside &&
-        !discovered
-    ) {
-
-        discovered = true;
-
-        message.textContent =
-            "YOU FOUND THE HIDDEN ROOM.";
-
-        status.textContent =
-            "You cannot be seen here.";
-
-        readButton.classList.add(
-            "show"
-        );
-
-    }
-
-
-    if (!inside) {
-
-        readButton.classList.remove(
-            "show"
-        );
-
-    }
-
-}
-
+});
 
 /* =========================================================
    READ BOOK
 ========================================================= */
 
-readButton.addEventListener(
-    "click",
-    function() {
+readBookButton.addEventListener("click",function(){
 
-        if (!discovered) {
-            return;
-        }
+  window.open(
+    "https://archive.org/details/dli.ernet.240835",
+    "_blank"
+  );
 
-        playing = false;
-
-        clearMovement();
-
-        found.classList.remove(
-            "hidden"
-        );
-
-    }
-);
-
+});
 
 /* =========================================================
-   RETRY
+   MESSAGE SYSTEM
 ========================================================= */
 
-document
-    .getElementById("retry")
-    .addEventListener(
-        "click",
-        function() {
+let messageOpen=false;
 
-            resetGame();
+function showDiscovery(index){
 
-            intro.classList.remove(
-                "hidden"
-            );
+  if(discovered.includes(index)){
+    return;
+  }
 
-        }
+  discovered.push(index);
+
+  const item=discoveries[index];
+
+  messageTitle.textContent=item.title;
+  messageText.textContent=item.text;
+
+  messageOpen=true;
+
+  message.classList.add("show");
+
+  updateProgress();
+
+  saveGame();
+
+  const marker =
+    document.querySelector(
+      '.marker[data-id="' + index + '"]'
     );
 
-
-/* =========================================================
-   MOBILE CONTROLS
-========================================================= */
-
-document
-    .querySelectorAll(
-        ".control"
-    )
-    .forEach(
-        button => {
-
-            const direction =
-                button.dataset.direction;
-
-
-            function press(e) {
-
-                e.preventDefault();
-
-                e.stopPropagation();
-
-                movement[direction] =
-                    true;
-
-                button.classList.add(
-                    "pressed"
-                );
-
-
-                if (
-                    e.pointerId !==
-                    undefined
-                ) {
-
-                    try {
-
-                        button.setPointerCapture(
-                            e.pointerId
-                        );
-
-                    }
-
-                    catch(error) {}
-
-                }
-
-            }
-
-
-            function release(e) {
-
-                e.preventDefault();
-
-                e.stopPropagation();
-
-                movement[direction] =
-                    false;
-
-                button.classList.remove(
-                    "pressed"
-                );
-
-            }
-
-
-            button.addEventListener(
-                "pointerdown",
-                press,
-                {
-                    passive:false
-                }
-            );
-
-
-            button.addEventListener(
-                "pointerup",
-                release,
-                {
-                    passive:false
-                }
-            );
-
-
-            button.addEventListener(
-                "pointercancel",
-                release,
-                {
-                    passive:false
-                }
-            );
-
-
-            button.addEventListener(
-                "lostpointercapture",
-                release,
-                {
-                    passive:false
-                }
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    function(e) {
-
-        const key =
-            e.key.toLowerCase();
-
-
-        if (
-            key === "w" ||
-            key === "arrowup"
-        ) {
-            movement.up = true;
-            e.preventDefault();
-        }
-
-
-        if (
-            key === "s" ||
-            key === "arrowdown"
-        ) {
-            movement.down = true;
-            e.preventDefault();
-        }
-
-
-        if (
-            key === "a" ||
-            key === "arrowleft"
-        ) {
-            movement.left = true;
-            e.preventDefault();
-        }
-
-
-        if (
-            key === "d" ||
-            key === "arrowright"
-        ) {
-            movement.right = true;
-            e.preventDefault();
-        }
-
-    },
-    {
-        passive:false
-    }
-);
-
-
-/* =========================================================
-   KEYBOARD RELEASE
-========================================================= */
-
-document.addEventListener(
-    "keyup",
-    function(e) {
-
-        const key =
-            e.key.toLowerCase();
-
-
-        if (
-            key === "w" ||
-            key === "arrowup"
-        )
-            movement.up = false;
-
-
-        if (
-            key === "s" ||
-            key === "arrowdown"
-        )
-            movement.down = false;
-
-
-        if (
-            key === "a" ||
-            key === "arrowleft"
-        )
-            movement.left = false;
-
-
-        if (
-            key === "d" ||
-            key === "arrowright"
-        )
-            movement.right = false;
-
-    }
-);
-
-
-/* =========================================================
-   CLEAR MOVEMENT
-========================================================= */
-
-function clearMovement() {
-
-    movement.up = false;
-
-    movement.down = false;
-
-    movement.left = false;
-
-    movement.right = false;
-
-
-    document
-        .querySelectorAll(
-            ".control"
-        )
-        .forEach(
-            button =>
-                button.classList.remove(
-                    "pressed"
-                )
-        );
+  if(marker){
+    marker.classList.add("done");
+  }
+
+  updateWorldPressure();
 
 }
 
+continueButton.addEventListener("click",function(){
+
+  message.classList.remove("show");
+
+  messageOpen=false;
+
+});
 
 /* =========================================================
-   SAFETY
+   PROGRESS
 ========================================================= */
 
-window.addEventListener(
-    "blur",
-    clearMovement
+function updateProgress(){
+
+  const count=discovered.length;
+
+  const percentage=
+    (count/discoveries.length)*100;
+
+  progressBar.style.width=
+    percentage+"%";
+
+  progressText.textContent=
+    count+
+    " / "+
+    discoveries.length+
+    " DISCOVERED";
+
+}
+
+/* =========================================================
+   PLAYER POSITION
+========================================================= */
+
+function updatePlayer(){
+
+  player.style.left=
+    playerX+"px";
+
+  player.style.top=
+    playerY+"px";
+
+}
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+function updateCamera(){
+
+  const viewportWidth=
+    window.innerWidth;
+
+  const viewportHeight=
+    window.innerHeight;
+
+  cameraX=
+    playerX+
+    playerSize/2-
+    viewportWidth/2;
+
+  cameraY=
+    playerY+
+    playerSize/2-
+    viewportHeight/2;
+
+  const maxCameraX=
+    WORLD_WIDTH-
+    viewportWidth;
+
+  const maxCameraY=
+    WORLD_HEIGHT-
+    viewportHeight;
+
+  cameraX=
+    Math.max(
+      0,
+      Math.min(
+        cameraX,
+        Math.max(0,maxCameraX)
+      )
+    );
+
+  cameraY=
+    Math.max(
+      0,
+      Math.min(
+        cameraY,
+        Math.max(0,maxCameraY)
+      )
+    );
+
+  worldLayer.style.transform=
+    "translate("+
+    (-cameraX)+
+    "px,"+
+    (-cameraY)+
+    "px)";
+
+}
+
+/* =========================================================
+   JOYSTICK
+   DIRECT TOUCH EVENTS
+========================================================= */
+
+function resetJoystick(){
+
+  joystickActive=false;
+
+  joystickX=0;
+  joystickY=0;
+
+  stick.style.transform=
+    "translate(0px,0px)";
+
+}
+
+function calculateJoystick(clientX,clientY){
+
+  const rect=
+    joystick.getBoundingClientRect();
+
+  const centerX=
+    rect.left+
+    rect.width/2;
+
+  const centerY=
+    rect.top+
+    rect.height/2;
+
+  let dx=
+    clientX-centerX;
+
+  let dy=
+    clientY-centerY;
+
+  const maxDistance=
+    rect.width/2-
+    32;
+
+  const distance=
+    Math.sqrt(
+      dx*dx+
+      dy*dy
+    );
+
+  if(distance>maxDistance){
+
+    dx=
+      dx/distance*
+      maxDistance;
+
+    dy=
+      dy/distance*
+      maxDistance;
+
+  }
+
+  joystickX=
+    dx/maxDistance;
+
+  joystickY=
+    dy/maxDistance;
+
+  stick.style.transform=
+    "translate("+
+    dx+
+    "px,"+
+    dy+
+    "px)";
+
+}
+
+joystick.addEventListener(
+  "touchstart",
+  function(event){
+
+    event.preventDefault();
+
+    joystickActive=true;
+
+    const touch=
+      event.touches[0];
+
+    calculateJoystick(
+      touch.clientX,
+      touch.clientY
+    );
+
+  },
+  {passive:false}
 );
 
+joystick.addEventListener(
+  "touchmove",
+  function(event){
+
+    event.preventDefault();
+
+    if(!joystickActive){
+      return;
+    }
+
+    const touch=
+      event.touches[0];
+
+    calculateJoystick(
+      touch.clientX,
+      touch.clientY
+    );
+
+  },
+  {passive:false}
+);
+
+joystick.addEventListener(
+  "touchend",
+  function(event){
+
+    event.preventDefault();
+
+    resetJoystick();
+
+  },
+  {passive:false}
+);
+
+joystick.addEventListener(
+  "touchcancel",
+  function(event){
+
+    event.preventDefault();
+
+    resetJoystick();
+
+  },
+  {passive:false}
+);
+
+/* =========================================================
+   KEYBOARD
+   ALSO WORKS FOR DESKTOP
+========================================================= */
+
+const keys={};
 
 document.addEventListener(
-    "visibilitychange",
-    function() {
+  "keydown",
+  function(event){
 
-        if (
-            document.hidden
-        ) {
+    keys[event.key.toLowerCase()]=true;
 
-            clearMovement();
-
-        }
-
-    }
+  }
 );
-
-
-/* Disable long-press menu */
 
 document.addEventListener(
-    "contextmenu",
-    function(e) {
+  "keyup",
+  function(event){
 
-        e.preventDefault();
+    keys[event.key.toLowerCase()]=false;
 
-    }
+  }
 );
 
+function getInput(){
+
+  let x=joystickX;
+  let y=joystickY;
+
+  if(keys["arrowleft"] || keys["a"]){
+    x-=1;
+  }
+
+  if(keys["arrowright"] || keys["d"]){
+    x+=1;
+  }
+
+  if(keys["arrowup"] || keys["w"]){
+    y-=1;
+  }
+
+  if(keys["arrowdown"] || keys["s"]){
+    y+=1;
+  }
+
+  const length=
+    Math.sqrt(
+      x*x+
+      y*y
+    );
+
+  if(length>1){
+
+    x/=length;
+    y/=length;
+
+  }
+
+  return {x,y};
+
+}
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
+function movePlayer(){
+
+  if(!playing){
+    return;
+  }
+
+  if(messageOpen){
+    return;
+  }
+
+  const input=getInput();
+
+  const speed=
+    3.8;
+
+  velocityX=
+    input.x*
+    speed;
+
+  velocityY=
+    input.y*
+    speed;
+
+  playerX+=velocityX;
+  playerY+=velocityY;
+
+  /*
+    Keep the player inside the world.
+    No building collision is used.
+    This preserves reliable movement.
+  */
+
+  playerX=
+    Math.max(
+      20,
+      Math.min(
+        WORLD_WIDTH-
+        playerSize-
+        20,
+        playerX
+      )
+    );
+
+  playerY=
+    Math.max(
+      20,
+      Math.min(
+        WORLD_HEIGHT-
+        playerSize-
+        20,
+        playerY
+      )
+    );
+
+  updatePlayer();
+  updateCamera();
+
+  checkDiscoveries();
+  checkReturn();
+
+}
+
+/* =========================================================
+   DISCOVERY DISTANCE
+========================================================= */
+
+function distanceBetween(
+  ax,
+  ay,
+  bx,
+  by
+){
+
+  const dx=ax-bx;
+  const dy=ay-by;
+
+  return Math.sqrt(
+    dx*dx+
+    dy*dy
+  );
+
+}
+
+function checkDiscoveries(){
+
+  const playerCenterX=
+    playerX+
+    playerSize/2;
+
+  const playerCenterY=
+    playerY+
+    playerSize/2;
+
+  document
+    .querySelectorAll(".marker")
+    .forEach(function(marker){
+
+      const index=
+        Number(
+          marker.dataset.id
+        );
+
+      if(discovered.includes(index)){
+        return;
+      }
+
+      const markerX=
+        parseFloat(marker.style.left)+27;
+
+      const markerY=
+        parseFloat(marker.style.top)+27;
+
+      const distance=
+        distanceBetween(
+          playerCenterX,
+          playerCenterY,
+          markerX,
+          markerY
+        );
+
+      if(distance<95){
+
+        showDiscovery(index);
+
+      }
+
+    });
+
+}
+
+/* =========================================================
+   WORLD PRESSURE
+========================================================= */
+
+function updateWorldPressure(){
+
+  const count=
+    discovered.length;
+
+  const ratio=
+    count/
+    discoveries.length;
+
+  if(ratio>=1){
+
+    document.body.classList.add(
+      "final-world"
+    );
+
+    return;
+
+  }
+
+  /*
+    The more the player understands,
+    the less free the world feels.
+
+    This is primarily atmospheric:
+    darker world, stronger surveillance.
+  */
+
+  if(ratio>=.8){
+
+    world.style.filter=
+      "brightness(.72)";
+
+  }else if(ratio>=.6){
+
+    world.style.filter=
+      "brightness(.80)";
+
+  }else if(ratio>=.4){
+
+    world.style.filter=
+      "brightness(.88)";
+
+  }else if(ratio>=.2){
+
+    world.style.filter=
+      "brightness(.94)";
+
+  }else{
+
+    world.style.filter=
+      "brightness(1)";
+
+  }
+
+}
+
+/* =========================================================
+   RETURN TO START
+========================================================= */
+
+function checkReturn(){
+
+  if(discovered.length<
+     discoveries.length){
+
+    return;
+
+  }
+
+  if(!returning){
+
+    returning=true;
+
+    saveGame();
+
+    showFinalReturnMessage();
+
+    return;
+
+  }
+
+  const distance=
+    distanceBetween(
+      playerX,
+      playerY,
+      240,
+      1610
+    );
+
+  if(distance<130){
+
+    completeGame();
+
+  }
+
+}
+
+function showFinalReturnMessage(){
+
+  messageTitle.textContent=
+    "THE CITY IS COMPLETE";
+
+  messageText.textContent=
+    "The city has stopped changing. " +
+    "Return to where you began.";
+
+  message.classList.add("show");
+
+  messageOpen=true;
+
+}
+
+/* =========================================================
+   COMPLETION
+========================================================= */
+
+function completeGame(){
+
+  completed=true;
+
+  returning=false;
+
+  saveGame();
+
+  playing=false;
+
+  completeScreen.style.display=
+    "flex";
+
+}
 
 /* =========================================================
    GAME LOOP
 ========================================================= */
 
-function gameLoop() {
+function gameLoop(){
 
-    movePlayer();
+  movePlayer();
 
-    requestAnimationFrame(
-        gameLoop
-    );
+  requestAnimationFrame(
+    gameLoop
+  );
 
 }
 
-
 /* =========================================================
-   START
+   INITIAL STATE
 ========================================================= */
 
-resetGame();
+loadGame();
+
+updatePlayer();
+
+updateCamera();
+
+updateWorldPressure();
 
 gameLoop();
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+  "resize",
+  function(){
+
+    updateCamera();
+
+  }
+);
 
 </script>
 
 </body>
-
 </html>
