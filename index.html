@@ -1,335 +1,4014 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 
 <meta name="viewport"
       content="width=device-width,
                initial-scale=1,
-               maximum-scale=1">
+               maximum-scale=1,
+               user-scalable=no">
 
-<title>CICAN BOOK QUEST</title>
+<title>THE WATCHED CITY — 1984</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-
-    background: #111;
-    color: white;
-
-    font-family: Arial, sans-serif;
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#080a0d;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  touch-action:none;
 }
 
-body {
-    padding: 30px 18px 50px;
+#game{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  display:block;
 }
 
-.container {
-    width: min(900px, 100%);
-    margin: auto;
+/* =====================================================
+   HUD
+===================================================== */
+
+#hud{
+  position:fixed;
+  left:16px;
+  top:14px;
+  z-index:20;
+  pointer-events:none;
+  text-shadow:0 2px 6px #000;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 35px;
+#title{
+  font-size:21px;
+  font-weight:900;
+  letter-spacing:4px;
 }
 
-h1 {
-    margin: 0 0 12px;
-
-    font-size: 32px;
-
-    letter-spacing: 5px;
+#part{
+  margin-top:5px;
+  font-size:12px;
+  letter-spacing:2px;
+  color:#bbb;
 }
 
-.subtitle {
-    color: #999;
-
-    line-height: 1.5;
+#objective{
+  margin-top:8px;
+  font-size:14px;
+  color:#f1c84b;
+  font-weight:bold;
 }
 
-
-/* BOOK GRID */
-
-#books {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(240px, 1fr)
-        );
-
-    gap: 18px;
+#progressBox{
+  position:fixed;
+  right:16px;
+  top:15px;
+  width:205px;
+  z-index:20;
+  pointer-events:none;
+  text-shadow:0 2px 6px #000;
 }
 
-
-/* BOOK CARD */
-
-.book {
-
-    min-height: 270px;
-
-    padding: 22px;
-
-    border:
-        1px solid #444;
-
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #292929,
-            #181818
-        );
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: space-between;
+#progressText{
+  text-align:right;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:2px;
+  margin-bottom:6px;
 }
 
-.icon {
-
-    font-size: 55px;
-
-    margin-bottom: 15px;
+#progressBar{
+  height:13px;
+  border:2px solid #777;
+  border-radius:20px;
+  overflow:hidden;
+  background:#171a1e;
 }
 
-.book h2 {
-
-    margin: 0 0 7px;
-
-    font-size: 22px;
+#progressFill{
+  width:0%;
+  height:100%;
+  background:#f1c84b;
+  transition:width:.35s ease;
 }
 
-.author {
+/* =====================================================
+   OVERLAYS
+===================================================== */
 
-    color: #aaa;
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:50;
 
-    font-size: 14px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  padding:18px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(65,10,10,.38),
+      rgba(0,0,0,.95)
+    );
 }
 
-.description {
+.panel{
+  width:min(700px,94vw);
+  max-height:90vh;
+  overflow:auto;
 
-    margin-top: 14px;
+  padding:28px 25px;
 
-    color: #888;
+  text-align:center;
 
-    font-size: 14px;
+  border-radius:18px;
+  border:1px solid #626b74;
 
-    line-height: 1.5;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20,24,30,.98),
+      rgba(5,7,10,.98)
+    );
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.8);
 }
 
-
-/* PLAY BUTTON */
-
-.play {
-
-    width: 100%;
-
-    margin-top: 20px;
-
-    padding: 15px;
-
-    border: none;
-
-    border-radius: 9px;
-
-    background: white;
-
-    color: black;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    cursor: pointer;
+.eye{
+  font-size:48px;
+  line-height:1;
+  margin-bottom:9px;
 }
 
-.play:active {
-
-    transform: scale(.97);
+.panel h1{
+  margin:0;
+  font-size:29px;
+  letter-spacing:5px;
 }
 
-
-/* FOOTER */
-
-footer {
-
-    margin-top: 40px;
-
-    text-align: center;
-
-    color: #555;
-
-    font-size: 12px;
+.panel h2{
+  margin:10px 0 24px;
+  font-size:15px;
+  letter-spacing:2px;
+  color:#d0d0d0;
 }
 
+.panel p{
+  max-width:590px;
+  margin:12px auto;
+
+  color:#d7d9dc;
+
+  font-size:15px;
+  line-height:1.65;
+}
+
+button{
+  min-width:190px;
+
+  margin:9px 4px 0;
+  padding:14px 22px;
+
+  border:0;
+  border-radius:11px;
+
+  background:#f1c84b;
+  color:#111;
+
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:1px;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 5px 20px rgba(0,0,0,.35);
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+.secondary{
+  background:#252b31;
+  color:#fff;
+  border:1px solid #59616a;
+}
+
+/* =====================================================
+   STORY
+===================================================== */
+
+#storyOverlay{
+  display:none;
+}
+
+.discoveryTag{
+  color:#f1c84b;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:4px;
+}
+
+.discoveryLine{
+  height:1px;
+  background:#f1c84b;
+  margin:10px 0 20px;
+}
+
+#storyTitle{
+  margin:0 0 13px;
+  font-size:27px;
+  letter-spacing:2px;
+}
+
+#storyText{
+  color:#d6d9dd;
+  font-size:15px;
+  line-height:1.7;
+}
+
+/* =====================================================
+   COMPLETION
+===================================================== */
+
+#bookOverlay{
+  display:none;
+}
+
+/* =====================================================
+   JOYSTICK
+===================================================== */
+
+#joystick{
+  position:fixed;
+
+  left:50%;
+  bottom:22px;
+  top:auto;
+
+  transform:translateX(-50%);
+
+  width:150px;
+  height:150px;
+
+  border-radius:50%;
+
+  border:2px solid rgba(220,230,240,.65);
+
+  background:
+    rgba(10,13,17,.55);
+
+  z-index:30;
+
+  touch-action:none;
+}
+
+#stick{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:65px;
+  height:65px;
+
+  margin-left:-32.5px;
+  margin-top:-32.5px;
+
+  border-radius:50%;
+
+  background:
+    rgba(220,225,230,.82);
+
+  border:2px solid #fff;
+
+  box-shadow:
+    0 4px 15px rgba(0,0,0,.45);
+
+  pointer-events:none;
+}
+
+/* =====================================================
+   HINT
+===================================================== */
+
+#hint{
+  position:fixed;
+
+  left:50%;
+  bottom:188px;
+
+  transform:translateX(-50%);
+
+  z-index:25;
+
+  max-width:75vw;
+
+  padding:9px 14px;
+
+  border-radius:9px;
+
+  background:
+    rgba(0,0,0,.75);
+
+  border:
+    1px solid rgba(255,255,255,.15);
+
+  color:#eee;
+
+  font-size:12px;
+  text-align:center;
+
+  pointer-events:none;
+
+  opacity:0;
+
+  transition:opacity .2s;
+}
+
+#hint.show{
+  opacity:1;
+}
+
+/* =====================================================
+   RESET
+===================================================== */
+
+#reset{
+  position:fixed;
+
+  right:12px;
+  bottom:12px;
+
+  z-index:35;
+
+  min-width:auto;
+
+  padding:7px 10px;
+
+  font-size:10px;
+
+  opacity:.4;
+
+  background:#20252b;
+  color:#ddd;
+}
+
+@media(max-width:600px){
+
+  #title{
+    font-size:17px;
+    letter-spacing:3px;
+  }
+
+  #part{
+    font-size:9px;
+  }
+
+  #objective{
+    font-size:11px;
+  }
+
+  #progressBox{
+    width:140px;
+    right:11px;
+    top:12px;
+  }
+
+  #progressText{
+    font-size:9px;
+  }
+
+  #joystick{
+    width:145px;
+    height:145px;
+    bottom:18px;
+  }
+
+  #hint{
+    bottom:178px;
+  }
+
+  .panel{
+    padding:22px 17px;
+  }
+
+  .panel h1{
+    font-size:22px;
+  }
+
+  .panel p{
+    font-size:14px;
+  }
+}
 </style>
-
 </head>
-
 
 <body>
 
-<div class="container">
+<canvas id="game"></canvas>
 
+<!-- =====================================================
+     HUD
+===================================================== -->
 
-<header>
+<div id="hud">
 
-    <h1>
-        CICAN BOOK QUEST
-    </h1>
+  <div id="title">
+    THE WATCHED CITY
+  </div>
 
-    <div class="subtitle">
+  <div id="part">
+    PART I — THE WORLD
+  </div>
 
-        PLAY A GAME.<br>
-        DISCOVER A BOOK.
+  <div id="objective">
+    Explore the city.
+  </div>
 
-    </div>
+</div>
 
-</header>
+<div id="progressBox">
 
+  <div id="progressText">
+    UNDERSTANDING 0%
+  </div>
 
-<main id="books">
-</main>
-
-
-<footer>
-
-    CICAN BOOK QUEST
-
-</footer>
-
+  <div id="progressBar">
+    <div id="progressFill"></div>
+  </div>
 
 </div>
 
 
+<!-- =====================================================
+     START SCREEN
+===================================================== -->
+
+<div id="startOverlay" class="overlay">
+
+  <div class="panel">
+
+    <div class="eye">👁️</div>
+
+    <h1>
+      THE WATCHED CITY
+    </h1>
+
+    <h2>
+      1984 — George Orwell
+    </h2>
+
+    <p>
+      You are about to enter a world you may know nothing about.
+    </p>
+
+    <p>
+      You will not be given a traditional summary.
+      You will discover the story by exploring it.
+    </p>
+
+    <p>
+      Walk through the city.
+      Find its institutions.
+      Meet its people.
+      Discover its secrets.
+      Experience its conflict.
+    </p>
+
+    <p>
+      <b>
+        By the time you finish,
+        you should understand the whole story.
+      </b>
+    </p>
+
+    <p>
+      Then the book will be unlocked.
+    </p>
+
+    <button id="startButton">
+      ENTER THE CITY
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     DISCOVERY SCREEN
+===================================================== -->
+
+<div id="storyOverlay" class="overlay">
+
+  <div class="panel">
+
+    <div class="discoveryTag">
+      DISCOVERY
+    </div>
+
+    <div class="discoveryLine"></div>
+
+    <h2 id="storyTitle">
+      THE CITY
+    </h2>
+
+    <p id="storyText"></p>
+
+    <button id="continueButton">
+      CONTINUE
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     COMPLETION
+===================================================== -->
+
+<div id="bookOverlay" class="overlay">
+
+  <div class="panel">
+
+    <div class="eye">👁️</div>
+
+    <h1>
+      THE WATCHED CITY
+    </h1>
+
+    <h2>
+      EXPERIENCE COMPLETE
+    </h2>
+
+    <p>
+      You have explored the world of
+      <b>1984</b>.
+    </p>
+
+    <p>
+      You have encountered its surveillance,
+      propaganda, controlled history,
+      language, memory, love, rebellion,
+      betrayal, interrogation and final breaking.
+    </p>
+
+    <p>
+      You now have the map of the story in your mind.
+    </p>
+
+    <p>
+      <b>
+        You understand the book.
+      </b>
+    </p>
+
+    <p>
+      Now you can discover it again through
+      Orwell's actual writing.
+    </p>
+
+    <button id="readBookButton">
+      🔓 READ 1984
+    </button>
+
+    <button
+      class="secondary"
+      onclick="location.href='../index.html'">
+      BACK TO LIBRARY
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     JOYSTICK
+===================================================== -->
+
+<div id="joystick">
+  <div id="stick"></div>
+</div>
+
+<div id="hint"></div>
+
+<button id="reset">
+  RESET
+</button>
+
+
 <script>
 
-/*
-=========================================================
-BOOK LIBRARY
+/* =========================================================
+   CICAN BOOK QUEST
+   THE WATCHED CITY
 
-Every book can have a completely different game.
+   FINAL 1984 VERSION
 
-To add a new book later, we add another object here.
-=========================================================
-*/
+   PLAYER:
+   ROUND WHITE BALL + TWO EYES
 
-const BOOKS = [
+   CONTROL:
+   BOTTOM-CENTER JOYSTICK
 
-    {
+   DESIGN:
+   FREE EXPLORATION
+   + BOOK-SPECIFIC DISCOVERY
+   + ENVIRONMENTAL STORYTELLING
+   + PROGRESSIVE WORLD CHANGE
+   + RETURN TO START
+   + BOOK UNLOCK
+========================================================= */
 
-        title: "1984",
 
-        author: "George Orwell",
+/* =========================================================
+   CANVAS
+========================================================= */
 
-        icon: "👁️",
+const canvas =
+  document.getElementById("game");
 
-        description:
-            "The city is watching. Can you find a place where you cannot be seen?",
+const ctx =
+  canvas.getContext("2d");
 
-        game:
-            "games/1984.html"
+let W=0;
+let H=0;
+
+function resize(){
+
+  W=
+    canvas.width=
+    window.innerWidth;
+
+  H=
+    canvas.height=
+    window.innerHeight;
+
+}
+
+window.addEventListener(
+  "resize",
+  resize
+);
+
+resize();
+
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+const WORLD_W=4200;
+const WORLD_H=3400;
+
+const START_X=700;
+const START_Y=2700;
+
+const camera={
+  x:0,
+  y:0
+};
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const player={
+
+  x:START_X,
+  y:START_Y,
+
+  vx:0,
+  vy:0,
+
+  radius:17,
+
+  speed:4.8,
+
+  acceleration:.75,
+
+  friction:.82,
+
+  directionX:0,
+  directionY:1,
+
+  walking:false,
+
+  animation:0
+
+};
+
+
+/* =========================================================
+   FOLLOWING CHARACTER
+========================================================= */
+
+const companion={
+
+  x:START_X+75,
+  y:START_Y+30,
+
+  animation:0
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const state={
+
+  started:false,
+
+  storyOpen:false,
+
+  completed:false,
+
+  returning:false
+
+};
+
+
+/* =========================================================
+   JOYSTICK
+========================================================= */
+
+const joystick=
+  document.getElementById(
+    "joystick"
+  );
+
+const stick=
+  document.getElementById(
+    "stick"
+  );
+
+let joystickTouchId=null;
+
+let joyX=0;
+let joyY=0;
+
+
+function setStick(
+  clientX,
+  clientY
+){
+
+  const rect=
+    joystick.getBoundingClientRect();
+
+  const centerX=
+    rect.left+
+    rect.width/2;
+
+  const centerY=
+    rect.top+
+    rect.height/2;
+
+  let dx=
+    clientX-centerX;
+
+  let dy=
+    clientY-centerY;
+
+  const max=
+    rect.width*.34;
+
+  const distance=
+    Math.sqrt(
+      dx*dx+
+      dy*dy
+    );
+
+
+  if(distance>max){
+
+    dx=
+      dx/distance*
+      max;
+
+    dy=
+      dy/distance*
+      max;
+
+  }
+
+
+  joyX=
+    dx/max;
+
+  joyY=
+    dy/max;
+
+
+  stick.style.transform=
+    "translate("+
+    dx+
+    "px,"+
+    dy+
+    "px)";
+
+}
+
+
+function resetStick(){
+
+  joystickTouchId=null;
+
+  joyX=0;
+  joyY=0;
+
+  stick.style.transform=
+    "translate(0px,0px)";
+
+}
+
+
+joystick.addEventListener(
+  "touchstart",
+  function(e){
+
+    if(
+      joystickTouchId!==null
+    )
+      return;
+
+
+    const touch=
+      e.changedTouches[0];
+
+
+    joystickTouchId=
+      touch.identifier;
+
+
+    setStick(
+      touch.clientX,
+      touch.clientY
+    );
+
+
+    e.preventDefault();
+
+  },
+  {passive:false}
+);
+
+
+document.addEventListener(
+  "touchmove",
+  function(e){
+
+    if(
+      joystickTouchId===null
+    )
+      return;
+
+
+    for(
+      const touch
+      of e.changedTouches
+    ){
+
+      if(
+        touch.identifier===
+        joystickTouchId
+      ){
+
+        setStick(
+          touch.clientX,
+          touch.clientY
+        );
+
+        e.preventDefault();
+
+        break;
+
+      }
 
     }
+
+  },
+  {passive:false}
+);
+
+
+document.addEventListener(
+  "touchend",
+  function(e){
+
+    for(
+      const touch
+      of e.changedTouches
+    ){
+
+      if(
+        touch.identifier===
+        joystickTouchId
+      ){
+
+        resetStick();
+
+        break;
+
+      }
+
+    }
+
+  },
+  {passive:false}
+);
+
+
+document.addEventListener(
+  "touchcancel",
+  function(e){
+
+    for(
+      const touch
+      of e.changedTouches
+    ){
+
+      if(
+        touch.identifier===
+        joystickTouchId
+      ){
+
+        resetStick();
+
+        break;
+
+      }
+
+    }
+
+  },
+  {passive:false}
+);
+
+
+/* =========================================================
+   1984 BOOK DNA
+========================================================= */
+
+const objects=[
+
+{
+id:"city",
+x:520,
+y:2450,
+part:1,
+title:"THE CITY",
+text:
+"Oceania is a controlled society where daily life is shaped by surveillance, propaganda, scarcity and obedience. The city itself is part of the system."
+},
+
+{
+id:"big-brother",
+x:820,
+y:2200,
+part:1,
+title:"BIG BROTHER",
+text:
+"Big Brother is the face of the Party. His image appears everywhere and represents the authority of the Party."
+},
+
+{
+id:"telescreen",
+x:1120,
+y:1900,
+part:1,
+title:"THE TELESCREEN",
+text:
+"The telescreen broadcasts Party messages while also allowing people to be watched. Private life has almost disappeared."
+},
+
+{
+id:"hate",
+x:1450,
+y:2150,
+part:1,
+title:"TWO MINUTES HATE",
+text:
+"Citizens are directed into collective hatred against enemies such as Emmanuel Goldstein. Emotion becomes something the Party can organize."
+},
+
+{
+id:"thoughtcrime",
+x:1770,
+y:1900,
+part:1,
+title:"THOUGHTCRIME",
+text:
+"In Oceania, dangerous ideas can themselves be crimes. The Party seeks control over thought as well as behaviour."
+},
+
+{
+id:"truth",
+x:2050,
+y:1600,
+part:1,
+title:"MINISTRY OF TRUTH",
+text:
+"Winston works at the Ministry of Truth, where records are altered so that the past agrees with the Party's current version of reality."
+},
+
+{
+id:"memory-hole",
+x:2320,
+y:1800,
+part:1,
+title:"MEMORY HOLE",
+text:
+"Documents that contradict the Party can be destroyed. Physical evidence of yesterday disappears."
+},
+
+{
+id:"newspeak",
+x:2600,
+y:1450,
+part:1,
+title:"NEWSPEAK",
+text:
+"Newspeak is designed to reduce the range of language. Limiting language can also limit the range of thought."
+},
+
+{
+id:"doublethink",
+x:2900,
+y:1700,
+part:1,
+title:"DOUBLETHINK",
+text:
+"Doublethink involves accepting contradictory ideas when the Party requires them. Reality can be reshaped to fit authority."
+},
+
+{
+id:"diary",
+x:3150,
+y:1250,
+part:1,
+title:"THE DIARY",
+text:
+"Winston secretly writes a diary. Recording his own thoughts creates a private space outside Party control."
+},
+
+{
+id:"memory",
+x:3420,
+y:1500,
+part:1,
+title:"MEMORY",
+text:
+"Winston's memories become important because the Party continually changes the official record."
+},
+
+{
+id:"julia",
+x:3500,
+y:2100,
+part:2,
+title:"JULIA",
+text:
+"Julia initially appears threatening to Winston. He later discovers that she also rejects the Party, and their relationship becomes a private rebellion."
+},
+
+{
+id:"golden-country",
+x:3200,
+y:2500,
+part:2,
+title:"THE GOLDEN COUNTRY",
+text:
+"The Golden Country represents freedom, beauty and a world beyond Party control."
+},
+
+{
+id:"paperweight",
+x:2800,
+y:2750,
+part:2,
+title:"THE GLASS PAPERWEIGHT",
+text:
+"The glass paperweight becomes a symbol of a fragile private world and Winston's connection with the past."
+},
+
+{
+id:"room",
+x:2350,
+y:2850,
+part:2,
+title:"THE ROOM ABOVE THE SHOP",
+text:
+"The room seems to provide Winston and Julia with privacy. That apparent sanctuary eventually becomes part of the trap."
+},
+
+{
+id:"proles",
+x:1850,
+y:2750,
+part:2,
+title:"THE PROLES",
+text:
+"The proles form the majority of the population. Winston sees their numbers as a possible source of change."
+},
+
+{
+id:"brotherhood",
+x:1500,
+y:2500,
+part:2,
+title:"THE BROTHERHOOD",
+text:
+"Winston believes the Brotherhood represents organized resistance against the Party."
+},
+
+{
+id:"forbidden",
+x:1200,
+y:2800,
+part:2,
+title:"FORBIDDEN KNOWLEDGE",
+text:
+"Winston wants to understand how the Party gained its power and whether its version of history is true."
+},
+
+{
+id:"war",
+x:900,
+y:3050,
+part:2,
+title:"PERMANENT WAR",
+text:
+"Continual war helps justify scarcity, fear, military priorities and the Party's permanent political structure."
+},
+
+{
+id:"trap",
+x:1250,
+y:3250,
+part:3,
+title:"THE TRAP",
+text:
+"Winston and Julia's private world is not secure. Their rebellion has been observed and their refuge becomes part of the trap."
+},
+
+{
+id:"thought-police",
+x:1700,
+y:3150,
+part:3,
+title:"THOUGHT POLICE",
+text:
+"The Thought Police enforce the Party's control. Surveillance can continue even when people believe they are acting privately."
+},
+
+{
+id:"love",
+x:2100,
+y:3000,
+part:3,
+title:"MINISTRY OF LOVE",
+text:
+"The Ministry of Love is associated with detention, punishment and interrogation. Winston is taken there after his rebellion collapses."
+},
+
+{
+id:"obrien",
+x:2450,
+y:3150,
+part:3,
+title:"O'BRIEN",
+text:
+"O'Brien initially appears to Winston as someone who may understand resistance. He instead becomes a central instrument of the Party's attempt to reshape Winston's mind."
+},
+
+{
+id:"room101",
+x:2850,
+y:3050,
+part:3,
+title:"ROOM 101",
+text:
+"Room 101 confronts prisoners with what they fear most. Winston finally breaks when his deepest fear is used against him."
+},
+
+{
+id:"end",
+x:3350,
+y:2850,
+part:3,
+title:"THE END",
+text:
+"Winston survives, but his resistance has been broken. The Party's control reaches into his inner beliefs."
+}
+
+];
+
+const TOTAL=
+  objects.length;
+
+
+/* =========================================================
+   SAVE SYSTEM
+========================================================= */
+
+const SAVE_KEY=
+  "cican_book_quest_1984_final";
+
+let discovered=
+  new Set();
+
+
+function saveGame(){
+
+  try{
+
+    localStorage.setItem(
+      SAVE_KEY,
+
+      JSON.stringify({
+
+        discovered:
+          [...discovered],
+
+        completed:
+          !!state.completed,
+
+        returning:
+          !!state.returning
+
+      })
+
+    );
+
+  }catch(error){
+
+    console.log(
+      "Save error:",
+      error
+    );
+
+  }
+
+}
+
+
+function loadGame(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(
+        SAVE_KEY
+      );
+
+
+    if(!raw)
+      return;
+
+
+    const saved=
+      JSON.parse(raw);
+
+
+    const validIds=
+      new Set(
+        objects.map(
+          obj=>obj.id
+        )
+      );
+
+
+    if(
+      Array.isArray(
+        saved.discovered
+      )
+    ){
+
+      saved.discovered.forEach(
+        id=>{
+
+          if(
+            validIds.has(id)
+          ){
+
+            discovered.add(id);
+
+          }
+
+        }
+      );
+
+    }
+
+
+    state.completed=
+      saved.completed===true;
+
+
+    state.returning=
+      saved.returning===true;
+
+
+  }catch(error){
+
+    /*
+       A damaged save must never
+       prevent the game from loading.
+    */
+
+    discovered.clear();
+
+    state.completed=false;
+    state.returning=false;
+
+  }
+
+}
+
+
+loadGame();
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function getProgress(){
+
+  return Math.floor(
+    discovered.size/
+    TOTAL*
+    100
+  );
+
+}
+
+
+function getPressure(){
+
+  return discovered.size/
+    TOTAL;
+
+}
+
+
+function getPart(){
+
+  let highest=1;
+
+
+  for(
+    const obj
+    of objects
+  ){
+
+    if(
+      discovered.has(
+        obj.id
+      )
+    ){
+
+      highest=
+        Math.max(
+          highest,
+          obj.part
+        );
+
+    }
+
+  }
+
+
+  return highest;
+
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+  const pct=
+    getProgress();
+
+
+  document.getElementById(
+    "progressText"
+  ).textContent=
+    "UNDERSTANDING "+
+    pct+
+    "%";
+
+
+  document.getElementById(
+    "progressFill"
+  ).style.width=
+    pct+"%";
+
+
+  const part=
+    getPart();
+
+
+  if(part===1){
+
+    document.getElementById(
+      "part"
+    ).textContent=
+      "PART I — THE WORLD";
+
+  }
+  else if(part===2){
+
+    document.getElementById(
+      "part"
+    ).textContent=
+      "PART II — THE REBELLION";
+
+  }
+  else{
+
+    document.getElementById(
+      "part"
+    ).textContent=
+      "PART III — THE BREAKING";
+
+  }
+
+
+  if(
+    pct>=100
+  ){
+
+    document.getElementById(
+      "objective"
+    ).textContent=
+      "Return to where you began.";
+
+  }
+  else{
+
+    document.getElementById(
+      "objective"
+    ).textContent=
+      "Explore the city.";
+
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+function updatePlayer(){
+
+  if(
+    !state.started ||
+    state.storyOpen ||
+    state.completed
+  )
+    return;
+
+
+  const strength=
+    Math.sqrt(
+      joyX*joyX+
+      joyY*joyY
+    );
+
+
+  if(
+    strength>.08
+  ){
+
+    player.vx+=
+      joyX*
+      player.acceleration;
+
+    player.vy+=
+      joyY*
+      player.acceleration;
+
+
+    player.directionX=
+      joyX;
+
+    player.directionY=
+      joyY;
+
+    player.walking=true;
+
+  }
+  else{
+
+    player.walking=false;
+
+  }
+
+
+  player.vx*=
+    player.friction;
+
+  player.vy*=
+    player.friction;
+
+
+  const velocity=
+    Math.sqrt(
+      player.vx*
+      player.vx+
+      player.vy*
+      player.vy
+    );
+
+
+  if(
+    velocity>
+    player.speed
+  ){
+
+    player.vx=
+      player.vx/
+      velocity*
+      player.speed;
+
+    player.vy=
+      player.vy/
+      velocity*
+      player.speed;
+
+  }
+
+
+  player.x+=
+    player.vx;
+
+  player.y+=
+    player.vy;
+
+
+  const margin=45;
+
+
+  player.x=
+    Math.max(
+      margin,
+      Math.min(
+        WORLD_W-margin,
+        player.x
+      )
+    );
+
+
+  player.y=
+    Math.max(
+      margin,
+      Math.min(
+        WORLD_H-margin,
+        player.y
+      )
+    );
+
+
+  if(
+    player.walking
+  ){
+
+    player.animation+=.18;
+
+  }
+
+}
+
+
+/* =========================================================
+   COMPANION
+========================================================= */
+
+function updateCompanion(){
+
+  if(
+    !state.started ||
+    state.storyOpen
+  )
+    return;
+
+
+  const dx=
+    player.x-
+    companion.x;
+
+  const dy=
+    player.y-
+    companion.y;
+
+
+  const distance=
+    Math.sqrt(
+      dx*dx+
+      dy*dy
+    );
+
+
+  if(
+    distance>110
+  ){
+
+    /*
+       The companion always remains
+       a little behind the player.
+    */
+
+    companion.x+=
+      dx/distance*
+      .65;
+
+    companion.y+=
+      dy/distance*
+      .65;
+
+    companion.animation+=.08;
+
+  }
+
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+function updateCamera(){
+
+  camera.x=
+    player.x-
+    W/2;
+
+  camera.y=
+    player.y-
+    H/2;
+
+
+  camera.x=
+    Math.max(
+      0,
+      Math.min(
+        WORLD_W-W,
+        camera.x
+      )
+    );
+
+
+  camera.y=
+    Math.max(
+      0,
+      Math.min(
+        WORLD_H-H,
+        camera.y
+      )
+    );
+
+}
+
+
+/* =========================================================
+   DISCOVERY
+========================================================= */
+
+function openDiscovery(obj){
+
+  state.storyOpen=true;
+
+  resetStick();
+
+
+  document.getElementById(
+    "storyTitle"
+  ).textContent=
+    obj.title;
+
+
+  document.getElementById(
+    "storyText"
+  ).textContent=
+    obj.text;
+
+
+  document.getElementById(
+    "storyOverlay"
+  ).style.display=
+    "flex";
+
+}
+
+
+function checkDiscoveries(){
+
+  if(
+    state.storyOpen ||
+    state.completed
+  )
+    return;
+
+
+  for(
+    const obj
+    of objects
+  ){
+
+    if(
+      discovered.has(
+        obj.id
+      )
+    )
+      continue;
+
+
+    const dx=
+      player.x-
+      obj.x;
+
+    const dy=
+      player.y-
+      obj.y;
+
+
+    const distance=
+      Math.sqrt(
+        dx*dx+
+        dy*dy
+      );
+
+
+    if(
+      distance<75
+    ){
+
+      discovered.add(
+        obj.id
+      );
+
+
+      /*
+         Every discovery immediately
+         changes the world.
+      */
+
+      saveGame();
+
+      updateHUD();
+
+      openDiscovery(
+        obj
+      );
+
+      return;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   CONTINUE
+========================================================= */
+
+document.getElementById(
+  "continueButton"
+)
+.addEventListener(
+  "click",
+  function(){
+
+    state.storyOpen=false;
+
+    document.getElementById(
+      "storyOverlay"
+    ).style.display=
+      "none";
+
+
+    /*
+       Save again after the player
+       leaves the discovery screen.
+    */
+
+    saveGame();
+
+  }
+);
+
+
+/* =========================================================
+   BUILDINGS
+========================================================= */
+
+/*
+   IMPORTANT:
+
+   These are deliberately visual.
+
+   The player is NOT trapped by them.
+
+   Freedom of movement is part of
+   the CICAN BOOK QUEST identity.
+*/
+
+const buildings=[
+
+{
+x:150,
+y:180,
+w:650,
+h:500,
+name:"VICTORY MANSIONS"
+},
+
+{
+x:980,
+y:120,
+w:600,
+h:620,
+name:"MINISTRY DISTRICT"
+},
+
+{
+x:1740,
+y:180,
+w:650,
+h:520,
+name:"PUBLIC RECORDS"
+},
+
+{
+x:2600,
+y:100,
+w:720,
+h:650,
+name:"PARTY DISTRICT"
+},
+
+{
+x:3400,
+y:300,
+w:620,
+h:500,
+name:"RESIDENTIAL BLOCKS"
+},
+
+{
+x:120,
+y:1050,
+w:700,
+h:520,
+name:"WORKERS DISTRICT"
+},
+
+{
+x:1020,
+y:950,
+w:570,
+h:650,
+name:"TELESCREEN CENTRE"
+},
+
+{
+x:1800,
+y:980,
+w:700,
+h:500,
+name:"MINISTRY OF TRUTH"
+},
+
+{
+x:2750,
+y:920,
+w:850,
+h:600,
+name:"ADMINISTRATION"
+},
+
+{
+x:200,
+y:1900,
+w:620,
+h:500,
+name:"PROLE DISTRICT"
+},
+
+{
+x:1050,
+y:1820,
+w:600,
+h:600,
+name:"PUBLIC SQUARE"
+},
+
+{
+x:1830,
+y:1750,
+w:720,
+h:570,
+name:"ARCHIVES"
+},
+
+{
+x:2750,
+y:1800,
+w:780,
+h:520,
+name:"PARTY HOUSING"
+},
+
+{
+x:120,
+y:2750,
+w:680,
+h:480,
+name:"INDUSTRIAL ZONE"
+},
+
+{
+x:950,
+y:2550,
+w:700,
+h:600,
+name:"SECURITY DISTRICT"
+},
+
+{
+x:1800,
+y:2500,
+w:620,
+h:600,
+name:"MINISTRY OF LOVE"
+},
+
+{
+x:2600,
+y:2500,
+w:850,
+h:550,
+name:"DETENTION COMPLEX"
+},
+
+{
+x:3600,
+y:2450,
+w:450,
+h:600,
+name:"RESTRICTED AREA"
+}
 
 ];
 
 
-/*
-=========================================================
-CREATE BOOK CARDS
-=========================================================
-*/
+function drawBuildings(){
 
-const booksContainer =
-    document.getElementById(
-        "books"
+  const p=
+    getPressure();
+
+
+  for(
+    const b
+    of buildings
+  ){
+
+    const s=
+      worldToScreen(
+        b.x,
+        b.y
+      );
+
+
+    ctx.fillStyle=
+      p>.65
+        ? "#101216"
+        : "#1c1f24";
+
+
+    ctx.fillRect(
+      s.x,
+      s.y,
+      b.w,
+      b.h
     );
 
 
-BOOKS.forEach(
-    book => {
-
-        const card =
-            document.createElement(
-                "article"
-            );
-
-        card.className =
-            "book";
+    ctx.strokeStyle=
+      p>.65
+        ? "#3d2528"
+        : "#40454b";
 
 
-        card.innerHTML = `
-
-            <div>
-
-                <div class="icon">
-                    ${book.icon}
-                </div>
-
-                <h2>
-                    ${book.title}
-                </h2>
-
-                <div class="author">
-                    ${book.author}
-                </div>
-
-                <div class="description">
-                    ${book.description}
-                </div>
-
-            </div>
-
-            <button
-                class="play"
-                type="button">
-
-                PLAY GAME
-
-            </button>
-
-        `;
+    ctx.lineWidth=3;
 
 
-        card
-            .querySelector(".play")
-            .addEventListener(
-                "click",
-                function() {
-
-                    window.location.href =
-                        book.game;
-
-                }
-            );
+    ctx.strokeRect(
+      s.x,
+      s.y,
+      b.w,
+      b.h
+    );
 
 
-        booksContainer.appendChild(
-            card
+    /*
+       Windows become increasingly
+       ominous as the player learns.
+    */
+
+    ctx.fillStyle=
+      p>.4
+        ? "rgba(120,25,25,.38)"
+        : "rgba(170,175,180,.12)";
+
+
+    const cols=
+      Math.floor(
+        b.w/85
+      );
+
+    const rows=
+      Math.floor(
+        b.h/85
+      );
+
+
+    for(
+      let ix=0;
+      ix<cols;
+      ix++
+    ){
+
+      for(
+        let iy=0;
+        iy<rows;
+        iy++
+      ){
+
+        ctx.fillRect(
+          s.x+20+ix*85,
+          s.y+22+iy*85,
+          24,
+          30
         );
 
+      }
+
     }
+
+
+    ctx.fillStyle=
+      "rgba(255,255,255,.38)";
+
+
+    text(
+      b.name,
+      b.x+b.w/2,
+      b.y+25,
+      10
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   GROUND
+========================================================= */
+
+function drawGround(){
+
+  const p=
+    getPressure();
+
+
+  let ground;
+
+
+  if(p<.20)
+    ground="#303236";
+  else if(p<.40)
+    ground="#292b2f";
+  else if(p<.60)
+    ground="#25272b";
+  else if(p<.80)
+    ground="#202126";
+  else
+    ground="#18191d";
+
+
+  ctx.fillStyle=
+    ground;
+
+
+  ctx.fillRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+
+  /*
+     Street grid.
+  */
+
+  ctx.strokeStyle=
+    "rgba(255,255,255,"+
+    (.045-p*.025)+
+    ")";
+
+
+  ctx.lineWidth=1;
+
+
+  const grid=180;
+
+
+  for(
+    let x=
+      Math.floor(
+        camera.x/grid
+      )*grid;
+
+    x<
+      camera.x+W+grid;
+
+    x+=grid
+  ){
+
+    const sx=
+      x-camera.x;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      sx,
+      0
+    );
+
+    ctx.lineTo(
+      sx,
+      H
+    );
+
+    ctx.stroke();
+
+  }
+
+
+  for(
+    let y=
+      Math.floor(
+        camera.y/grid
+      )*grid;
+
+    y<
+      camera.y+H+grid;
+
+    y+=grid
+  ){
+
+    const sy=
+      y-camera.y;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      0,
+      sy
+    );
+
+    ctx.lineTo(
+      W,
+      sy
+    );
+
+    ctx.stroke();
+
+  }
+
+
+  /*
+     Roads.
+  */
+
+  ctx.fillStyle=
+    p>.65
+      ? "#15161a"
+      : "#222428";
+
+
+  for(
+    let y=400;
+    y<WORLD_H;
+    y+=900
+  ){
+
+    const s=
+      worldToScreen(
+        0,
+        y
+      );
+
+
+    ctx.fillRect(
+      s.x,
+      s.y,
+      WORLD_W,
+      120
+    );
+
+  }
+
+
+  for(
+    let x=400;
+    x<WORLD_W;
+    x+=1100
+  ){
+
+    const s=
+      worldToScreen(
+        x,
+        0
+      );
+
+
+    ctx.fillRect(
+      s.x,
+      s.y,
+      120,
+      WORLD_H
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PROPAGANDA
+========================================================= */
+
+const signs=[
+
+{
+x:450,
+y:900,
+title:"BIG BROTHER",
+sub:"IS WATCHING YOU"
+},
+
+{
+x:2450,
+y:820,
+title:"WAR IS PEACE",
+sub:"FREEDOM IS SLAVERY"
+},
+
+{
+x:3650,
+y:1050,
+title:"IGNORANCE",
+sub:"IS STRENGTH"
+},
+
+{
+x:820,
+y:1700,
+title:"TRUTH",
+sub:"BELONGS TO THE PARTY"
+},
+
+{
+x:3300,
+y:1700,
+title:"2 + 2",
+sub:"= 5"
+},
+
+{
+x:1550,
+y:800,
+title:"THE PARTY",
+sub:"IS ALWAYS RIGHT"
+},
+
+{
+x:3650,
+y:1900,
+title:"WATCH",
+sub:"YOUR THOUGHTS"
+}
+
+];
+
+
+function drawPropaganda(){
+
+  /*
+     Every few discoveries reveal
+     another layer of propaganda.
+
+     At 100%, everything is visible.
+  */
+
+  const count=
+    Math.min(
+      signs.length,
+      1+
+      Math.floor(
+        discovered.size/
+        3.5
+      )
+    );
+
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    const sign=
+      signs[i];
+
+
+    const s=
+      worldToScreen(
+        sign.x,
+        sign.y
+      );
+
+
+    ctx.fillStyle=
+      "rgba(85,15,18,.82)";
+
+
+    ctx.fillRect(
+      s.x-90,
+      s.y-55,
+      180,
+      110
+    );
+
+
+    ctx.strokeStyle=
+      "#642a2d";
+
+
+    ctx.strokeRect(
+      s.x-90,
+      s.y-55,
+      180,
+      110
+    );
+
+
+    ctx.fillStyle=
+      "#eee";
+
+
+    text(
+      sign.title,
+      sign.x,
+      sign.y-14,
+      14
+    );
+
+
+    text(
+      sign.sub,
+      sign.x,
+      sign.y+17,
+      10
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LAMPS
+========================================================= */
+
+function drawLamps(){
+
+  for(
+    let x=250;
+    x<WORLD_W;
+    x+=420
+  ){
+
+    for(
+      let y=300;
+      y<WORLD_H;
+      y+=700
+    ){
+
+      const s=
+        worldToScreen(
+          x,
+          y
+        );
+
+
+      if(
+        s.x<-40 ||
+        s.x>W+40 ||
+        s.y<-40 ||
+        s.y>H+40
+      )
+        continue;
+
+
+      ctx.strokeStyle=
+        "#33363b";
+
+      ctx.lineWidth=5;
+
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        s.x,
+        s.y
+      );
+
+      ctx.lineTo(
+        s.x,
+        s.y+45
+      );
+
+      ctx.stroke();
+
+
+      ctx.fillStyle=
+        "#e8bd53";
+
+
+      ctx.beginPath();
+
+      ctx.arc(
+        s.x,
+        s.y,
+        7,
+        0,
+        Math.PI*2
+      );
+
+      ctx.fill();
+
+
+      const glow=
+        ctx.createRadialGradient(
+          s.x,
+          s.y,
+          2,
+          s.x,
+          s.y,
+          55
+        );
+
+
+      glow.addColorStop(
+        0,
+        "rgba(241,200,75,.16)"
+      );
+
+      glow.addColorStop(
+        1,
+        "rgba(241,200,75,0)"
+      );
+
+
+      ctx.fillStyle=
+        glow;
+
+
+      ctx.beginPath();
+
+      ctx.arc(
+        s.x,
+        s.y,
+        55,
+        0,
+        Math.PI*2
+      );
+
+      ctx.fill();
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   CAMERAS
+========================================================= */
+
+function drawCameras(){
+
+  /*
+     Surveillance density grows continuously
+     with understanding.
+  */
+
+  const count=
+    Math.min(
+      30,
+      2+
+      Math.floor(
+        discovered.size/1.5
+      )
+    );
+
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    const x=
+      350+
+      ((i*617)%3400);
+
+    const y=
+      250+
+      ((i*431)%2850);
+
+
+    const s=
+      worldToScreen(
+        x,
+        y
+      );
+
+
+    if(
+      s.x<-80 ||
+      s.x>W+80 ||
+      s.y<-80 ||
+      s.y>H+80
+    )
+      continue;
+
+
+    ctx.fillStyle=
+      "#171a1e";
+
+
+    ctx.fillRect(
+      s.x-16,
+      s.y-8,
+      32,
+      16
+    );
+
+
+    ctx.fillStyle=
+      "#d34d4d";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+      s.x+7,
+      s.y,
+      4,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    const beam=
+      .04+
+      getPressure()*.10;
+
+
+    ctx.fillStyle=
+      "rgba(180,35,35,"+
+      beam+
+      ")";
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      s.x,
+      s.y
+    );
+
+    ctx.lineTo(
+      s.x+130,
+      s.y+100
+    );
+
+    ctx.lineTo(
+      s.x-130,
+      s.y+100
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+  }
+
+}
+
+
+/* =========================================================
+   NPC POPULATION
+========================================================= */
+
+const npcs=[];
+
+
+for(
+  let i=0;
+  i<70;
+  i++
+){
+
+  npcs.push({
+
+    x:
+      200+
+      ((i*523)%3800),
+
+    y:
+      200+
+      ((i*337)%3000),
+
+    speed:
+      .2+
+      (i%3)*.07,
+
+    phase:
+      i*.8
+
+  });
+
+}
+
+
+function updateNPCs(){
+
+  if(
+    !state.started ||
+    state.storyOpen
+  )
+    return;
+
+
+  const p=
+    getPressure();
+
+
+  for(
+    const npc
+    of npcs
+  ){
+
+    npc.phase+=
+      .003+
+      p*.003;
+
+
+    /*
+       Later stages create more
+       controlled movement.
+    */
+
+    npc.x+=
+      Math.cos(
+        npc.phase
+      )*
+      npc.speed;
+
+    npc.y+=
+      Math.sin(
+        npc.phase*1.7
+      )*
+      npc.speed;
+
+
+    npc.x=
+      Math.max(
+        60,
+        Math.min(
+          WORLD_W-60,
+          npc.x
+        )
+      );
+
+
+    npc.y=
+      Math.max(
+        60,
+        Math.min(
+          WORLD_H-60,
+          npc.y
+        )
+      );
+
+  }
+
+}
+
+
+function drawNPCs(){
+
+  /*
+     Population changes with the story.
+
+     Early:
+     ordinary citizens.
+
+     Middle:
+     citizens + controlled figures.
+
+     Late:
+     more officers,
+     fewer relaxed-looking people.
+  */
+
+  const p=
+    getPressure();
+
+
+  const visible=
+    Math.min(
+      60,
+      12+
+      Math.floor(
+        p*48
+      )
+    );
+
+
+  for(
+    let i=0;
+    i<visible;
+    i++
+  ){
+
+    const npc=
+      npcs[i];
+
+
+    const s=
+      worldToScreen(
+        npc.x,
+        npc.y
+      );
+
+
+    if(
+      s.x<-40 ||
+      s.x>W+40 ||
+      s.y<-50 ||
+      s.y>H+50
+    )
+      continue;
+
+
+    /*
+       Head.
+    */
+
+    ctx.fillStyle=
+      "#111316";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+      s.x,
+      s.y-10,
+      6,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /*
+       Body.
+    */
+
+    ctx.fillStyle=
+      "#15181c";
+
+
+    ctx.fillRect(
+      s.x-7,
+      s.y-4,
+      14,
+      22
+    );
+
+
+    /*
+       Controlled officers gradually appear.
+    */
+
+    if(
+      p>.35 &&
+      i%4===0
+    ){
+
+      ctx.fillStyle=
+        "#272b30";
+
+
+      ctx.fillRect(
+        s.x-9,
+        s.y-7,
+        18,
+        27
+      );
+
+
+      ctx.fillStyle=
+        "#8b292d";
+
+
+      ctx.fillRect(
+        s.x-7,
+        s.y-1,
+        14,
+        3
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   ENVIRONMENTAL STORY
+========================================================= */
+
+function drawEnvironmentalStory(){
+
+  const p=
+    getPressure();
+
+
+  /*
+     Early understanding.
+  */
+
+  if(
+    p>.08
+  ){
+
+    text(
+      "BIG BROTHER IS WATCHING YOU",
+      2100,
+      760,
+      12
+    );
+
+  }
+
+
+  /*
+     Records / destroyed information.
+  */
+
+  if(
+    p>.28
+  ){
+
+    for(
+      let i=0;
+      i<12;
+      i++
+    ){
+
+      const x=
+        1400+
+        ((i*317)%1500);
+
+      const y=
+        1150+
+        ((i*191)%1100);
+
+
+      const s=
+        worldToScreen(
+          x,
+          y
+        );
+
+
+      ctx.fillStyle=
+        "rgba(210,210,210,.35)";
+
+
+      ctx.fillRect(
+        s.x,
+        s.y,
+        22,
+        4
+      );
+
+    }
+
+  }
+
+
+  /*
+     More red atmosphere.
+  */
+
+  if(
+    p>.55
+  ){
+
+    const pulse=
+      .055+
+      Math.sin(
+        Date.now()/300
+      )*.02;
+
+
+    ctx.fillStyle=
+      "rgba(130,0,0,"+
+      pulse+
+      ")";
+
+
+    ctx.fillRect(
+      0,
+      0,
+      W,
+      H
+    );
+
+  }
+
+
+  /*
+     Final psychological pressure.
+  */
+
+  if(
+    p>.80
+  ){
+
+    ctx.fillStyle=
+      "rgba(0,0,0,.055)";
+
+
+    ctx.fillRect(
+      0,
+      0,
+      W,
+      H
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DISCOVERY MARKERS
+========================================================= */
+
+function drawStoryObjects(){
+
+  for(
+    const obj
+    of objects
+  ){
+
+    if(
+      discovered.has(
+        obj.id
+      )
+    )
+      continue;
+
+
+    const s=
+      worldToScreen(
+        obj.x,
+        obj.y
+      );
+
+
+    if(
+      s.x<-60 ||
+      s.x>W+60 ||
+      s.y<-60 ||
+      s.y>H+60
+    )
+      continue;
+
+
+    const pulse=
+      1+
+      Math.sin(
+        Date.now()/300
+      )*.12;
+
+
+    ctx.strokeStyle=
+      "rgba(241,200,75,.8)";
+
+    ctx.lineWidth=2;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+      s.x,
+      s.y,
+      25*pulse,
+      0,
+      Math.PI*2
+    );
+
+    ctx.stroke();
+
+
+    ctx.fillStyle=
+      "#f1c84b";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+      s.x,
+      s.y,
+      6,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    text(
+      "DISCOVER",
+      obj.x,
+      obj.y+37,
+      9
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   BOOK
+========================================================= */
+
+const book={
+
+  x:START_X,
+  y:START_Y,
+
+  radius:28
+
+};
+
+
+function drawBook(){
+
+  if(
+    state.completed
+  )
+    return;
+
+
+  const s=
+    worldToScreen(
+      book.x,
+      book.y
+    );
+
+
+  ctx.save();
+
+
+  ctx.translate(
+    s.x,
+    s.y
+  );
+
+
+  ctx.rotate(-.08);
+
+
+  /*
+     The book becomes gold only
+     after the experience is complete.
+  */
+
+  ctx.fillStyle=
+    getProgress()>=100
+      ? "#f1c84b"
+      : "#765d31";
+
+
+  ctx.fillRect(
+    -21,
+    -27,
+    42,
+    54
+  );
+
+
+  ctx.fillStyle=
+    "#151719";
+
+
+  ctx.fillRect(
+    -14,
+    -20,
+    28,
+    40
+  );
+
+
+  ctx.fillStyle=
+    "#f1c84b";
+
+
+  ctx.font=
+    "bold 9px Arial";
+
+  ctx.textAlign=
+    "center";
+
+
+  ctx.fillText(
+    "1984",
+    0,
+    3
+  );
+
+
+  ctx.restore();
+
+
+  /*
+     Final return marker.
+  */
+
+  if(
+    getProgress()>=100
+  ){
+
+    const pulse=
+      40+
+      Math.sin(
+        Date.now()/250
+      )*
+      7;
+
+
+    ctx.strokeStyle=
+      "rgba(241,200,75,.85)";
+
+    ctx.lineWidth=3;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+      s.x,
+      s.y,
+      pulse,
+      0,
+      Math.PI*2
+    );
+
+    ctx.stroke();
+
+
+    text(
+      "RETURN HERE",
+      book.x,
+      book.y+55,
+      11
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER BALL
+========================================================= */
+
+function drawBallCharacter(){
+
+  const s=
+    worldToScreen(
+      player.x,
+      player.y
+    );
+
+
+  const bounce=
+    player.walking
+      ?
+        Math.sin(
+          player.animation
+        )*2
+      :
+        0;
+
+
+  /*
+     Shadow.
+  */
+
+  ctx.fillStyle=
+    "rgba(0,0,0,.42)";
+
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    s.x,
+    s.y+19,
+    19,
+    7,
+    0,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /*
+     Ball gradient.
+  */
+
+  const gradient=
+    ctx.createRadialGradient(
+      s.x-6,
+      s.y-8+bounce,
+      2,
+
+      s.x,
+      s.y+bounce,
+      25
+    );
+
+
+  gradient.addColorStop(
+    0,
+    "#ffffff"
+  );
+
+  gradient.addColorStop(
+    .72,
+    "#e8ebee"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#9da4ab"
+  );
+
+
+  ctx.fillStyle=
+    gradient;
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    s.x,
+    s.y+bounce,
+    player.radius,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /*
+     Outline.
+  */
+
+  ctx.strokeStyle=
+    "#16191d";
+
+  ctx.lineWidth=2;
+
+  ctx.stroke();
+
+
+  /*
+     Eyes.
+  */
+
+  ctx.fillStyle=
+    "#111";
+
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    s.x-6,
+    s.y-5+bounce,
+    3.2,
+    5.3,
+    0,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    s.x+6,
+    s.y-5+bounce,
+    3.2,
+    5.3,
+    0,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /*
+     Eye highlights.
+  */
+
+  ctx.fillStyle=
+    "#fff";
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    s.x-7,
+    s.y-7+bounce,
+    1,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    s.x+5,
+    s.y-7+bounce,
+    1,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+}
+
+
+/* =========================================================
+   FOLLOWING HUMAN
+========================================================= */
+
+function drawCompanion(){
+
+  const s=
+    worldToScreen(
+      companion.x,
+      companion.y
+    );
+
+
+  const step=
+    Math.sin(
+      companion.animation
+    )*2;
+
+
+  /*
+     Shadow.
+  */
+
+  ctx.fillStyle=
+    "rgba(0,0,0,.4)";
+
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    s.x,
+    s.y+21,
+    14,
+    5,
+    0,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /*
+     Legs.
+  */
+
+  ctx.fillStyle=
+    "#16181c";
+
+
+  ctx.fillRect(
+    s.x-7,
+    s.y+7,
+    5,
+    15+step
+  );
+
+
+  ctx.fillRect(
+    s.x+2,
+    s.y+7,
+    5,
+    15-step
+  );
+
+
+  /*
+     Body.
+  */
+
+  ctx.fillStyle=
+    "#28313a";
+
+
+  ctx.fillRect(
+    s.x-9,
+    s.y-7,
+    18,
+    18
+  );
+
+
+  /*
+     Head.
+  */
+
+  ctx.fillStyle=
+    "#c49b78";
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    s.x,
+    s.y-14,
+    7,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /*
+     Hair.
+  */
+
+  ctx.fillStyle=
+    "#171719";
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    s.x,
+    s.y-17,
+    7,
+    Math.PI,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+}
+
+
+/* =========================================================
+   TEXT HELPER
+========================================================= */
+
+function text(
+  value,
+  x,
+  y,
+  size
+){
+
+  const s=
+    worldToScreen(
+      x,
+      y
+    );
+
+
+  ctx.font=
+    "bold "+
+    size+
+    "px Arial";
+
+
+  ctx.textAlign=
+    "center";
+
+  ctx.textBaseline=
+    "middle";
+
+
+  ctx.fillText(
+    value,
+    s.x,
+    s.y
+  );
+
+}
+
+
+/* =========================================================
+   RETURN TO START
+========================================================= */
+
+function checkBook(){
+
+  if(
+    state.completed
+  )
+    return;
+
+
+  if(
+    getProgress()<100
+  )
+    return;
+
+
+  /*
+     At 100% the player must
+     physically return to the beginning.
+  */
+
+  state.returning=true;
+
+
+  const dx=
+    player.x-
+    book.x;
+
+  const dy=
+    player.y-
+    book.y;
+
+
+  const distance=
+    Math.sqrt(
+      dx*dx+
+      dy*dy
+    );
+
+
+  if(
+    distance<85
+  ){
+
+    state.completed=true;
+
+    state.returning=false;
+
+    saveGame();
+
+
+    document.getElementById(
+      "bookOverlay"
+    ).style.display=
+      "flex";
+
+  }
+
+}
+
+
+/* =========================================================
+   HINT
+========================================================= */
+
+let hintTimer=0;
+
+
+function updateHint(){
+
+  const hint=
+    document.getElementById(
+      "hint"
+    );
+
+
+  if(
+    state.storyOpen ||
+    state.completed ||
+    !state.started
+  ){
+
+    hint.classList.remove(
+      "show"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    getProgress()>=100
+  ){
+
+    hint.textContent=
+      "THE CITY IS COMPLETE — RETURN TO WHERE YOU BEGAN.";
+
+    hint.classList.add(
+      "show"
+    );
+
+    return;
+
+  }
+
+
+  let nearest=null;
+
+  let nearestDistance=
+    Infinity;
+
+
+  for(
+    const obj
+    of objects
+  ){
+
+    if(
+      discovered.has(
+        obj.id
+      )
+    )
+      continue;
+
+
+    const dx=
+      player.x-
+      obj.x;
+
+    const dy=
+      player.y-
+      obj.y;
+
+
+    const distance=
+      Math.sqrt(
+        dx*dx+
+        dy*dy
+      );
+
+
+    if(
+      distance<
+      nearestDistance
+    ){
+
+      nearestDistance=
+        distance;
+
+      nearest=
+        obj;
+
+    }
+
+  }
+
+
+  if(
+    nearest &&
+    nearestDistance<220
+  ){
+
+    hint.textContent=
+      "DISCOVERY NEARBY — "+
+      nearest.title;
+
+
+    hint.classList.add(
+      "show"
+    );
+
+
+    hintTimer=20;
+
+  }
+  else{
+
+    hintTimer--;
+
+
+    if(
+      hintTimer<=0
+    ){
+
+      hint.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   VIGNETTE
+========================================================= */
+
+function drawVignette(){
+
+  const p=
+    getPressure();
+
+
+  const strength=
+    .25+
+    p*.30;
+
+
+  const gradient=
+    ctx.createRadialGradient(
+      W/2,
+      H/2,
+      Math.min(W,H)*.2,
+
+      W/2,
+      H/2,
+      Math.max(W,H)*.72
+    );
+
+
+  gradient.addColorStop(
+    0,
+    "rgba(0,0,0,0)"
+  );
+
+
+  gradient.addColorStop(
+    1,
+    "rgba(0,0,0,"+
+    strength+
+    ")"
+  );
+
+
+  ctx.fillStyle=
+    gradient;
+
+
+  ctx.fillRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+}
+
+
+/* =========================================================
+   DRAW
+========================================================= */
+
+function draw(){
+
+  ctx.clearRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+
+  drawGround();
+
+  drawBuildings();
+
+  drawPropaganda();
+
+  drawLamps();
+
+  drawCameras();
+
+  drawNPCs();
+
+  drawEnvironmentalStory();
+
+  drawStoryObjects();
+
+  drawBook();
+
+  drawCompanion();
+
+  drawBallCharacter();
+
+  drawVignette();
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.getElementById(
+  "startButton"
+)
+.addEventListener(
+  "click",
+  function(){
+
+    state.started=true;
+
+
+    document.getElementById(
+      "startOverlay"
+    ).style.display=
+      "none";
+
+
+    updateHUD();
+
+  }
 );
+
+
+/* =========================================================
+   READ BOOK
+========================================================= */
+
+document.getElementById(
+  "readBookButton"
+)
+.addEventListener(
+  "click",
+  function(){
+
+    window.open(
+      "https://archive.org/details/dli.ernet.240835",
+      "_blank"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+document.getElementById(
+  "reset"
+)
+.addEventListener(
+  "click",
+  function(){
+
+    const yes=
+      confirm(
+        "Reset THE WATCHED CITY and start again?"
+      );
+
+
+    if(!yes)
+      return;
+
+
+    localStorage.removeItem(
+      SAVE_KEY
+    );
+
+
+    location.reload();
+
+  }
+);
+
+
+/* =========================================================
+   MAIN LOOP
+========================================================= */
+
+function gameLoop(){
+
+  updatePlayer();
+
+  updateCompanion();
+
+  updateNPCs();
+
+  updateCamera();
+
+  checkDiscoveries();
+
+  checkBook();
+
+  updateHUD();
+
+  updateHint();
+
+  draw();
+
+  requestAnimationFrame(
+    gameLoop
+  );
+
+}
+
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+
+updateHUD();
+
+gameLoop();
 
 </script>
 
 </body>
-
 </html>
